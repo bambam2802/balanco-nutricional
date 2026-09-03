@@ -34,15 +34,27 @@ const TOM_CINTURA: Record<NivelRiscoCintura, BadgeTone> = {
 function ReguaIMC({
   faixas,
   imc,
+  classificacaoAtual,
 }: {
   faixas: { classificacao: ClassificacaoIMC; rotulo: string; min: number | null; max: number | null }[]
   imc: number
+  classificacaoAtual: ClassificacaoIMC
 }) {
   const ESCALA_MIN = 12
   const ESCALA_MAX = 45
   const amplitude = ESCALA_MAX - ESCALA_MIN
 
   const posicaoMarcador = ((Math.min(Math.max(imc, ESCALA_MIN), ESCALA_MAX) - ESCALA_MIN) / amplitude) * 100
+
+  const coresFortes: Record<ClassificacaoIMC, string> = {
+    baixo_peso: 'bg-deficit',
+    eutrofia: 'bg-ok',
+    sobrepeso: 'bg-superavit',
+    obesidade_1: 'bg-danger',
+    obesidade_2: 'bg-danger',
+    obesidade_3: 'bg-danger',
+    sem_classificacao: 'bg-ink-3',
+  }
 
   const cores: Record<ClassificacaoIMC, string> = {
     baixo_peso: 'bg-deficit-soft',
@@ -83,6 +95,29 @@ function ReguaIMC({
         <span>{ESCALA_MIN}</span>
         <span>{ESCALA_MAX}</span>
       </div>
+      <ul className="mt-3 flex flex-col gap-1">
+        {faixas.map((f) => {
+          const ativa = f.classificacao === classificacaoAtual
+          const intervalo =
+            f.min === null
+              ? `< ${formatarNumero(f.max ?? 0, 1)}`
+              : f.max === null
+                ? `> ${formatarNumero(f.min, 1)}`
+                : `${formatarNumero(f.min, 1)} – ${formatarNumero(f.max, 1)}`
+          return (
+            <li
+              key={f.classificacao}
+              className={`flex items-center justify-between gap-2 text-xs ${ativa ? 'font-semibold text-ink' : 'text-ink-3'}`}
+            >
+              <span className="flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${coresFortes[f.classificacao]}`} />
+                {f.rotulo}
+              </span>
+              <span className="num">{intervalo}</span>
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }
@@ -180,7 +215,7 @@ export function StepResultados() {
             </Callout>
           ) : (
             <>
-              <ReguaIMC faixas={imc.faixas} imc={imc.imc} />
+              <ReguaIMC faixas={imc.faixas} imc={imc.imc} classificacaoAtual={imc.classificacao} />
               <p className="mt-3 text-xs text-ink-3">
                 {imc.protocolo === 'lipschitz_idoso'
                   ? 'Classificação para idosos (60+) — Lipschitz, 1994'

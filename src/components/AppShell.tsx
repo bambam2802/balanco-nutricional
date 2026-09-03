@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Leaf, RotateCcw } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ORDEM_PASSOS, useAvaliacao } from '../state/avaliacao'
+import { useAvaliacao } from '../state/avaliacao'
+import { ORDEM_PASSOS } from '../state/reducer'
 import { StepProgress } from './ui/StepProgress'
 import { Button } from './ui/Button'
 
@@ -51,6 +52,11 @@ export function AppShell({ children, largura = '3xl' }: AppShellProps) {
     setDirecao(idxAtual >= idxAnterior ? 1 : -1)
     setPassoAnterior(estado.passo)
   }
+
+  // Ao trocar de passo, o palco volta ao topo — o botão de avanço fica no fim do passo anterior.
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [estado.passo])
 
   const larguraClasse = largura === '5xl' ? 'max-w-5xl' : 'max-w-3xl'
 

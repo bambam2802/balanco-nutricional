@@ -20,7 +20,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 pão francês, 2 fatias de queijo minas e 1 xícara de café com leite',
         kcal: 400,
         nivel: 2,
-        foto: 'https://images.unsplash.com/photo-1584776296944-ab6fb57b0bdd?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1530868156061-e5e8a5450c51?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'cafe-3',
@@ -59,7 +59,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 barra de cereal e 1 copo de suco de uva integral',
         kcal: 180,
         nivel: 2,
-        foto: 'https://images.unsplash.com/photo-1530816878870-4f4fe65f5946?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1633360821154-1935fb5671e6?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'lanche_manha-3',
@@ -67,7 +67,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '4 unidades de biscoito recheado de chocolate e 1 xícara de chá',
         kcal: 300,
         nivel: 3,
-        foto: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1596108005029-8b6b02720dfd?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'lanche_manha-4',
@@ -75,7 +75,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 coxinha de frango e 1 lata de refrigerante',
         kcal: 500,
         nivel: 4,
-        foto: 'https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1769254870299-338bfd99aabd?w=640&h=480&fit=crop&q=70',
       },
     ],
   },
@@ -90,7 +90,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 prato de salada verde, 100g de frango grelhado e 4 col. sopa de arroz integral',
         kcal: 500,
         nivel: 1,
-        foto: 'https://images.unsplash.com/photo-1607532941433-304659e8198a?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1582034986517-30d163aa1da9?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'almoco-2',
@@ -98,7 +98,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '4 col. sopa de arroz, 2 col. sopa de feijão, 100g de carne bovina grelhada e salada',
         kcal: 700,
         nivel: 2,
-        foto: 'https://images.unsplash.com/photo-1562525922-cde78e2119f9?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'almoco-3',
@@ -106,7 +106,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 concha de feijoada, 4 col. sopa de arroz branco e couve refogada',
         kcal: 900,
         nivel: 3,
-        foto: 'https://images.unsplash.com/photo-1609607285694-e283bd2ea9a0?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1627906327792-4ede6149189f?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'almoco-4',
@@ -137,7 +137,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 sanduíche natural de peito de peru e 1 copo de suco de melancia',
         kcal: 280,
         nivel: 2,
-        foto: 'https://images.unsplash.com/photo-1665931040985-88ceff0fd38e?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1591224942496-0b89685d0c7c?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'lanche_tarde-3',
@@ -145,7 +145,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '2 unidades de pão de queijo e 1 xícara de café com leite',
         kcal: 320,
         nivel: 3,
-        foto: 'https://images.unsplash.com/photo-1751199592465-f142293a8cc6?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1745031601360-b189f522ea90?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'lanche_tarde-4',
@@ -215,7 +215,7 @@ export const REFEICOES: Refeicao[] = [
         descricao: '1 pote de iogurte natural com 1 col. sopa de mel',
         kcal: 180,
         nivel: 2,
-        foto: 'https://images.unsplash.com/photo-1571212515416-fef01fc43637?w=640&h=480&fit=crop&q=70',
+        foto: 'https://images.unsplash.com/photo-1633893215265-4763142f9b57?w=640&h=480&fit=crop&q=70',
       },
       {
         id: 'ceia-3',

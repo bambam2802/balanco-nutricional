@@ -1,0 +1,53 @@
+/* Impressão do relatório: papel A4 ocupando a página inteira, sem cortes. */
+
+.relatorio-papel {
+  box-shadow: var(--shadow-pop);
+}
+
+.relatorio-secao {
+  break-inside: avoid;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  .relatorio-papel {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .relatorio-secao {
+    break-inside: avoid;
+  }
+
+  /* Lista longa (dia alimentar) pode quebrar entre linhas, nunca no meio de uma. */
+  .relatorio-secao--fluida {
+    break-inside: auto;
+  }
+  .relatorio-secao--fluida .resumo-linha {
+    break-inside: avoid;
+  }
+  .relatorio-secao--fluida > :first-child {
+    break-after: avoid;
+  }
+
+  .relatorio-svg {
+    width: 100% !important;
+  }
+  .relatorio-svg svg {
+    max-height: 200px;
+  }
+}
