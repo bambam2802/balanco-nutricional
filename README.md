@@ -2,7 +2,13 @@
 
 Calcula VET, classifica IMC (adulto e idoso) e risco cardiovascular, monta um dia alimentar por fotos, compara com o VET e projeta o peso. Gera relatório para impressão ou PDF. Tudo roda no navegador, sem cadastro nem servidor.
 
-## Rodar no computador
+## Abrir sem instalar nada (jeito mais simples para a feira)
+
+Rode uma vez `npm run build` (ou use o arquivo já gerado). Ele cria **um único arquivo** `dist/index.html`, com tudo dentro. Basta copiar esse arquivo para qualquer notebook ou pendrive e abrir com dois cliques no Chrome ou Edge. Não precisa de servidor nem de internet, exceto para carregar as fotos dos pratos (sem internet aparece um ícone no lugar da foto).
+
+Atenção: o `index.html` da raiz do projeto **não** abre direto: ele é só o molde usado pelo Vite. Use o de `dist/`.
+
+## Rodar em modo de desenvolvimento
 
 ```bash
 npm install
