@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Leaf, RotateCcw } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useAvaliacao } from '../state/avaliacao'
@@ -79,18 +79,16 @@ export function AppShell({ children, largura = '3xl' }: AppShellProps) {
       </div>
 
       <main className={`mx-auto w-full flex-1 px-4 py-6 sm:px-6 ${larguraClasse}`} style={{ clipPath: 'inset(0)' }}>
-        <AnimatePresence mode="wait" custom={direcao}>
-          <motion.div
-            key={estado.passo}
-            custom={direcao}
-            initial={{ opacity: 0, x: direcao * 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direcao * -24 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
+        {/* Só animação de entrada: com AnimatePresence mode="wait" o passo anterior ficava preso em
+            opacidade 0 (a saída nunca concluía) e o Balanço aparecia em branco. */}
+        <motion.div
+          key={estado.passo}
+          initial={{ opacity: 0, x: direcao * 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+        >
+          {children}
+        </motion.div>
       </main>
 
       <footer className="no-print mx-auto w-full max-w-3xl px-4 pb-8 pt-2 text-xs text-ink-3 sm:px-6">
