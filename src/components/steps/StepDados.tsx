@@ -18,6 +18,7 @@ interface FormularioDados {
   atividade: NivelAtividade
   cinturaCm: string
   quadrilCm: string
+  gorduraPct: string
 }
 
 type CamposObrigatorios = 'sexo' | 'idade' | 'pesoKg' | 'alturaCm'
@@ -25,7 +26,16 @@ type Erros = Partial<Record<keyof FormularioDados, string>>
 
 function paraFormulario(dados: DadosPessoa | null): FormularioDados {
   if (!dados) {
-    return { sexo: '', idade: '', pesoKg: '', alturaCm: '', atividade: 'leve', cinturaCm: '', quadrilCm: '' }
+    return {
+      sexo: '',
+      idade: '',
+      pesoKg: '',
+      alturaCm: '',
+      atividade: 'leve',
+      cinturaCm: '',
+      quadrilCm: '',
+      gorduraPct: '',
+    }
   }
   return {
     sexo: dados.sexo,
@@ -35,6 +45,7 @@ function paraFormulario(dados: DadosPessoa | null): FormularioDados {
     atividade: dados.atividade,
     cinturaCm: dados.cinturaCm != null ? String(dados.cinturaCm) : '',
     quadrilCm: dados.quadrilCm != null ? String(dados.quadrilCm) : '',
+    gorduraPct: dados.gorduraPct != null ? String(dados.gorduraPct).replace('.', ',') : '',
   }
 }
 
@@ -86,6 +97,13 @@ function validarCampo(campo: keyof FormularioDados, form: FormularioDados): stri
     return undefined
   }
 
+  if (campo === 'gorduraPct') {
+    if (form.gorduraPct.trim() === '') return undefined
+    const n = paraNumero(form.gorduraPct)
+    if (n === null || n < 1 || n > 70) return 'Informe a gordura corporal entre 1 e 70 %'
+    return undefined
+  }
+
   return undefined
 }
 
@@ -115,6 +133,7 @@ export function StepDados() {
       ...CAMPOS_OBRIGATORIOS,
       'cinturaCm',
       'quadrilCm',
+      'gorduraPct',
     ]
     const novosErros: Erros = {}
     for (const campo of camposParaValidar) {
@@ -126,6 +145,7 @@ export function StepDados() {
 
     const cintura = paraNumero(form.cinturaCm)
     const quadril = paraNumero(form.quadrilCm)
+    const gorduraPct = paraNumero(form.gorduraPct)
 
     const dados: DadosPessoa = {
       sexo: form.sexo as Sexo,
@@ -135,6 +155,7 @@ export function StepDados() {
       atividade: form.atividade,
       ...(cintura !== null ? { cinturaCm: cintura } : {}),
       ...(quadril !== null ? { quadrilCm: quadril } : {}),
+      ...(gorduraPct !== null ? { gorduraPct } : {}),
     }
 
     dispatch({ type: 'definirDados', dados })
@@ -247,9 +268,9 @@ export function StepDados() {
       </Card>
 
       <Card>
-        <CardTitle>Medidas com fita (opcional)</CardTitle>
+        <CardTitle>Medidas (opcional)</CardTitle>
         <div className="mt-4 flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <NumberField
               label="Cintura"
               unit="cm"
@@ -267,6 +288,16 @@ export function StepDados() {
               onChange={(v) => atualizar('quadrilCm', v)}
               onBlur={() => aoSairDoCampo('quadrilCm')}
               error={erros.quadrilCm}
+            />
+            <NumberField
+              label="Gordura corporal"
+              unit="%"
+              inputMode="decimal"
+              value={form.gorduraPct}
+              onChange={(v) => atualizar('gorduraPct', v)}
+              onBlur={() => aoSairDoCampo('gorduraPct')}
+              error={erros.gorduraPct}
+              hint="Se tiver bioimpedância ou adipômetro. Sem esse dado, estimamos pela idade e IMC."
             />
           </div>
           <Callout tone="info">Sem cintura e quadril, o risco cardiovascular não é calculado.</Callout>

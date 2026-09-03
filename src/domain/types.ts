@@ -13,6 +13,8 @@ export interface DadosPessoa {
   /** Opcionais: sem eles o risco cardiovascular não é classificado. */
   cinturaCm?: number
   quadrilCm?: number
+  /** % de gordura corporal medida; opcional, 1–70. Sem ela o modelo de Hall estima por Jackson 2002. */
+  gorduraPct?: number
 }
 
 export interface ResultadoVET {

@@ -14,6 +14,8 @@ export interface EstadoAvaliacao {
   escolhas: Escolhas
   /** Índice da refeição em foco no passo 3 (0–5). */
   refeicaoAtual: number
+  /** Meta de peso definida no passo 4 (modo meta do modelo de Hall). */
+  meta: { pesoKg: number; semanas: number } | null
 }
 
 export type AcaoAvaliacao =
@@ -23,6 +25,7 @@ export type AcaoAvaliacao =
   | { type: 'irParaRefeicao'; indice: number }
   | { type: 'irPara'; passo: Passo }
   | { type: 'novaAvaliacao' }
+  | { type: 'definirMeta'; meta: { pesoKg: number; semanas: number } | null }
 
 export const ESTADO_INICIAL: EstadoAvaliacao = {
   passo: 'dados',
@@ -30,6 +33,7 @@ export const ESTADO_INICIAL: EstadoAvaliacao = {
   equacao: 'mifflin',
   escolhas: {},
   refeicaoAtual: 0,
+  meta: null,
 }
 
 const ULTIMA_REFEICAO = REFEICOES.length - 1
@@ -60,7 +64,16 @@ function sanitizarDados(bruto: unknown): DadosPessoa | null {
     atividade: d.atividade as DadosPessoa['atividade'],
     cinturaCm: numeroValido(d.cinturaCm, 1, 400) ? d.cinturaCm : undefined,
     quadrilCm: numeroValido(d.quadrilCm, 1, 400) ? d.quadrilCm : undefined,
+    gorduraPct: numeroValido(d.gorduraPct, 1, 70) ? d.gorduraPct : undefined,
   }
+}
+
+function sanitizarMeta(bruto: unknown): { pesoKg: number; semanas: number } | null {
+  if (!bruto || typeof bruto !== 'object') return null
+  const m = bruto as Record<string, unknown>
+  if (!numeroValido(m.pesoKg, 20, 300)) return null
+  if (typeof m.semanas !== 'number' || !Number.isInteger(m.semanas) || m.semanas < 1 || m.semanas > 104) return null
+  return { pesoKg: m.pesoKg, semanas: m.semanas }
 }
 
 function sanitizarEscolhas(bruto: unknown): Escolhas {
@@ -91,6 +104,7 @@ export function sanitizarEstado(bruto: unknown): EstadoAvaliacao {
     equacao: EQUACOES.some((e) => e.id === b.equacao) ? (b.equacao as Equacao) : ESTADO_INICIAL.equacao,
     escolhas: sanitizarEscolhas(b.escolhas),
     refeicaoAtual: limitarIndice(b.refeicaoAtual),
+    meta: sanitizarMeta(b.meta),
   }
 }
 
@@ -108,5 +122,7 @@ export function reducer(estado: EstadoAvaliacao, acao: AcaoAvaliacao): EstadoAva
       return { ...estado, passo: acao.passo }
     case 'novaAvaliacao':
       return ESTADO_INICIAL
+    case 'definirMeta':
+      return { ...estado, meta: acao.meta }
   }
 }

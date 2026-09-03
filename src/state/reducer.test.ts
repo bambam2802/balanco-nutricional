@@ -27,6 +27,7 @@ describe('sanitizarEstado (sessionStorage corrompido ou de versão antiga)', () 
       equacao: 'fao',
       escolhas: { cafe: { tipo: 'opcao', opcaoId: 'cafe-2' }, ceia: { tipo: 'nao_faco' } },
       refeicaoAtual: 3,
+      meta: { pesoKg: 65, semanas: 12 },
     }
     expect(sanitizarEstado(estado)).toEqual(estado)
   })
@@ -72,6 +73,30 @@ describe('sanitizarEstado (sessionStorage corrompido ou de versão antiga)', () 
   it('cai para a equação padrão quando a salva é desconhecida', () => {
     expect(sanitizarEstado({ equacao: 'katch' }).equacao).toBe('mifflin')
   })
+
+  it('preserva gorduraPct válido e remove o inválido sem perder os demais dados', () => {
+    const comGordura = { ...dadosValidos, gorduraPct: 22 }
+    expect(sanitizarEstado({ passo: 'resultados', dados: comGordura }).dados).toEqual(comGordura)
+
+    const invalido = sanitizarEstado({ passo: 'resultados', dados: { ...dadosValidos, gorduraPct: 0 } }).dados
+    expect(invalido?.gorduraPct).toBeUndefined()
+    expect(invalido?.pesoKg).toBe(dadosValidos.pesoKg)
+
+    const acima = sanitizarEstado({ passo: 'resultados', dados: { ...dadosValidos, gorduraPct: 71 } }).dados
+    expect(acima?.gorduraPct).toBeUndefined()
+  })
+
+  it('preserva meta válida e zera a inválida', () => {
+    const meta = { pesoKg: 70, semanas: 24 }
+    expect(sanitizarEstado({ meta }).meta).toEqual(meta)
+
+    expect(sanitizarEstado({ meta: { pesoKg: 10, semanas: 12 } }).meta).toBeNull()
+    expect(sanitizarEstado({ meta: { pesoKg: 70, semanas: 0 } }).meta).toBeNull()
+    expect(sanitizarEstado({ meta: { pesoKg: 70, semanas: 12.5 } }).meta).toBeNull()
+    expect(sanitizarEstado({ meta: { pesoKg: 70, semanas: 105 } }).meta).toBeNull()
+    expect(sanitizarEstado({ meta: 'x' }).meta).toBeNull()
+    expect(sanitizarEstado({}).meta).toBeNull()
+  })
 })
 
 describe('reducer', () => {
@@ -80,11 +105,20 @@ describe('reducer', () => {
     expect(reducer(ESTADO_INICIAL, { type: 'irParaRefeicao', indice: -1 }).refeicaoAtual).toBe(0)
   })
 
-  it('novaAvaliacao zera tudo, inclusive a refeição atual', () => {
+  it('novaAvaliacao zera tudo, inclusive a refeição atual e a meta', () => {
     const cheio = reducer(
-      reducer({ ...ESTADO_INICIAL, dados: dadosValidos, passo: 'refeicoes' }, { type: 'irParaRefeicao', indice: 4 }),
-      { type: 'escolher', refeicao: 'cafe', escolha: { tipo: 'nao_faco' } },
+      reducer(
+        reducer({ ...ESTADO_INICIAL, dados: dadosValidos, passo: 'refeicoes' }, { type: 'irParaRefeicao', indice: 4 }),
+        { type: 'escolher', refeicao: 'cafe', escolha: { tipo: 'nao_faco' } },
+      ),
+      { type: 'definirMeta', meta: { pesoKg: 65, semanas: 12 } },
     )
     expect(reducer(cheio, { type: 'novaAvaliacao' })).toEqual(ESTADO_INICIAL)
+  })
+
+  it('definirMeta grava a meta e null limpa', () => {
+    const comMeta = reducer(ESTADO_INICIAL, { type: 'definirMeta', meta: { pesoKg: 65, semanas: 12 } })
+    expect(comMeta.meta).toEqual({ pesoKg: 65, semanas: 12 })
+    expect(reducer(comMeta, { type: 'definirMeta', meta: null }).meta).toBeNull()
   })
 })
