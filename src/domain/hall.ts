@@ -229,7 +229,9 @@ function calcularTEE(estado: EstadoCorporal, b: BaselineHall, ingestaoKcalDia: n
   const tef = FRACAO_TEF * ingestaoKcalDia
   const pesoAtual = pesoDoEstado(estado)
 
-  const expend = b.k + GAMMA_L * estado.lean + GAMMA_F * estado.fat + b.deltaAtividade * pesoAtual + estado.therm + tef
+  // `DailyParams` do planner clampa actparam em ≥ 0 só no laço diário (não em K nem em cals4balance).
+  const deltaDia = Math.max(0, b.deltaAtividade)
+  const expend = b.k + GAMMA_L * estado.lean + GAMMA_F * estado.fat + deltaDia * pesoAtual + estado.therm + tef
 
   const numerador = (1 - p) * (ETA_F / RHO_F) + p * (ETA_L / RHO_L)
   const denominador = 1 + p * (ETA_L / RHO_L) + (1 - p) * (ETA_F / RHO_F)
@@ -303,12 +305,14 @@ function passoRungeKutta(estado: EstadoCorporal, b: BaselineHall, ingestaoKcalDi
 }
 
 function pontoDoEstado(dia: number, estado: EstadoCorporal, b: BaselineHall, ingestaoKcalDia: number): PontoHall {
-  const pesoKg = pesoDoEstado(estado)
+  // Exibição com piso em 0: ingestão quase nula por meses leva o modelo a valores sem sentido físico.
+  const pesoKg = Math.max(0, pesoDoEstado(estado))
+  const gorduraKg = Math.max(0, estado.fat)
   return {
     dia,
     pesoKg,
-    gorduraKg: estado.fat,
-    gorduraPct: (estado.fat / pesoKg) * 100,
+    gorduraKg,
+    gorduraPct: pesoKg > 0 ? Math.min(100, (gorduraKg / pesoKg) * 100) : 0,
     gastoKcal: calcularTEE(estado, b, ingestaoKcalDia),
   }
 }

@@ -6,13 +6,15 @@ import { calcularIMC, classificarIMC } from '../../domain/imc'
 import { avaliarRiscoCV } from '../../domain/riscoCardio'
 import { somarCalorias, classificarBalanco } from '../../domain/balanco'
 import { projetarPeso } from '../../domain/projecao'
+import { projetarPesoHall, caloriasParaMeta } from '../../domain/hall'
 import { formatarKcal, formatarKg, formatarNumero, formatarSinal } from '../../domain/formatar'
 import { REFEICOES } from '../../data/refeicoes'
 import { EQUACOES } from '../../data/equacoes'
 import { NIVEIS_ATIVIDADE } from '../../data/atividade'
 import type { ClassificacaoBalanco, ClassificacaoIMC, NivelRiscoCintura } from '../../domain/types'
+import type { EntradaHall } from '../../domain/hall'
 import type { BadgeTone } from '../ui/Badge'
-import type { TomProjecao } from '../charts/ProjecaoChart'
+import type { TomProjecao, SerieProjecao } from '../charts/ProjecaoChart'
 import { CardTitle } from '../ui/Card'
 import { Badge } from '../ui/Badge'
 import { Callout } from '../ui/Callout'
@@ -85,8 +87,33 @@ export function Relatorio() {
     () => (dados && balanco ? projetarPeso(dados.pesoKg, balanco.diferenca, SEMANAS_RELATORIO) : null),
     [dados, balanco],
   )
+  const entradaHall: EntradaHall | null = useMemo(
+    () =>
+      dados && vet
+        ? {
+            sexo: dados.sexo,
+            idade: dados.idade,
+            pesoKg: dados.pesoKg,
+            alturaCm: dados.alturaCm,
+            tmbKcal: vet.tmb,
+            vetKcal: vet.vet,
+            gorduraPct: dados.gorduraPct,
+          }
+        : null,
+    [dados, vet],
+  )
+  const projecaoHall = useMemo(
+    () => (entradaHall ? projetarPesoHall(entradaHall, ingerido, SEMANAS_RELATORIO) : null),
+    [entradaHall, ingerido],
+  )
+  const resultadoMeta = useMemo(
+    () => (entradaHall && estado.meta ? caloriasParaMeta(entradaHall, estado.meta.pesoKg, estado.meta.semanas) : null),
+    [entradaHall, estado.meta],
+  )
+  const diffHojeMeta =
+    resultadoMeta?.kcalDia != null ? Math.round(ingerido - resultadoMeta.kcalDia) : 0
 
-  if (!dados || !vet || !imc || !risco || !balanco || !projecao) {
+  if (!dados || !vet || !imc || !risco || !balanco || !projecao || !projecaoHall) {
     return (
       <div className="flex flex-col gap-4">
         <Callout tone="warn">Preencha seus dados antes de gerar o relatório.</Callout>
@@ -119,6 +146,26 @@ export function Relatorio() {
   ]
   if (dados.cinturaCm != null) camposDados.push({ rotulo: 'Cintura', valor: `${formatarNumero(dados.cinturaCm, 0)} cm` })
   if (dados.quadrilCm != null) camposDados.push({ rotulo: 'Quadril', valor: `${formatarNumero(dados.quadrilCm, 0)} cm` })
+  if (dados.gorduraPct != null) {
+    camposDados.push({ rotulo: 'Gordura corporal', valor: `${formatarNumero(dados.gorduraPct, 0)} % (medida)` })
+  }
+
+  const series: SerieProjecao[] = [
+    {
+      id: 'hall',
+      rotulo: 'Modelo dinâmico',
+      pontos: projecaoHall.pontos,
+      tom: TOM_PROJECAO[balanco.classificacao],
+      estilo: 'solida',
+    },
+    {
+      id: 'linear',
+      rotulo: 'Regra simples (7.700 kcal = 1 kg)',
+      pontos: projecao.pontos,
+      tom: 'neutro',
+      estilo: 'tracejada',
+    },
+  ]
 
   return (
     <div className="flex flex-col gap-6">
@@ -251,30 +298,71 @@ export function Relatorio() {
         </section>
 
         <section className="relatorio-secao mt-6 border-t border-border pt-6">
-          <CardTitle>Projeção de peso (12 semanas)</CardTitle>
+          <CardTitle>Projeção de peso ({SEMANAS_RELATORIO} semanas)</CardTitle>
           <div className="relatorio-svg mt-3">
-            <ProjecaoChart
-              pontos={projecao.pontos}
-              tom={TOM_PROJECAO[balanco.classificacao]}
-              pesoInicial={dados.pesoKg}
-            />
+            <ProjecaoChart series={series} pesoInicial={dados.pesoKg} />
           </div>
           <p className="font-display mt-3 text-base font-semibold text-ink">
-            Em {SEMANAS_RELATORIO} semanas:{' '}
-            {balanco.classificacao === 'normocalorico'
-              ? `tendência de manter ${formatarKg(projecao.pesoFinalKg)}`
-              : `${formatarKg(projecao.pesoFinalKg)} (${formatarSinal(projecao.deltaKg, 1)} kg)`}
+            Em {SEMANAS_RELATORIO} semanas: <span className="num">{formatarKg(projecaoHall.pesoFinalKg)}</span> (
+            <span className="num">{formatarSinal(projecaoHall.deltaKg, 1)}</span> kg) pelo modelo dinâmico ·
+            regra simples: <span className="num">{formatarKg(projecao.pesoFinalKg)}</span>
           </p>
-          {projecao.ritmoAcelerado ? (
+          <p className="mt-2 text-sm text-ink-2">
+            Gordura corporal {dados.gorduraPct != null ? 'medida' : 'estimada'}:{' '}
+            <span className="num">{formatarNumero(projecaoHall.gorduraPctInicial, 0)} %</span> →{' '}
+            <span className="num">{formatarNumero(projecaoHall.gorduraPctFinal, 0)} %</span>
+          </p>
+          {projecaoHall.ritmoAcelerado ? (
             <p className="mt-2 text-sm text-warn">
               Ritmo acima de 1 kg por semana não é recomendado; esta é só uma estimativa.
             </p>
           ) : null}
           <p className="mt-3 text-xs text-ink-3">
-            Estimativa linear simplificada: 7.700 kcal ≈ 1 kg de gordura corporal. Para uma simulação
-            dinâmica, veja o Body Weight Planner do NIDDK: https://www.niddk.nih.gov/bwp
+            Projeção pelo modelo de Hall et al. (Lancet, 2011), o mesmo do Body Weight Planner do NIDDK
+            (https://www.niddk.nih.gov/bwp). A regra simples de 7.700 kcal por kg superestima a mudança
+            porque ignora a adaptação do gasto energético. Estimativa educativa.
+            {dados.idade < 18 ? ' Estimativa de gordura corporal feita para adultos.' : ''}
           </p>
         </section>
+
+        {estado.meta && resultadoMeta ? (
+          <section className="relatorio-secao mt-6 border-t border-border pt-6">
+            <CardTitle>Meta</CardTitle>
+            {resultadoMeta.alcancavel && resultadoMeta.kcalDia != null ? (
+              <>
+                <p className="font-display mt-2 text-base font-semibold text-ink">
+                  Para chegar a <span className="num">{formatarKg(estado.meta.pesoKg)}</span> em{' '}
+                  <span className="num">{estado.meta.semanas}</span> semanas: cerca de{' '}
+                  <span className="num">{formatarKcal(resultadoMeta.kcalDia)}</span> por dia.
+                  {resultadoMeta.kcalManterAlvo != null ? (
+                    <>
+                      {' '}
+                      Depois, para manter: cerca de{' '}
+                      <span className="num">{formatarKcal(resultadoMeta.kcalManterAlvo)}</span> por dia.
+                    </>
+                  ) : null}
+                </p>
+                <p className="mt-1 text-sm text-ink-2">
+                  Hoje: cerca de <span className="num">{formatarKcal(ingerido)}</span> por dia
+                  {diffHojeMeta !== 0 ? (
+                    <>
+                      , <span className="num">{formatarKcal(Math.abs(diffHojeMeta))}</span>{' '}
+                      {diffHojeMeta > 0 ? 'a mais' : 'a menos'} que o necessário
+                    </>
+                  ) : null}
+                  .
+                </p>
+                {resultadoMeta.abaixoSeguro ? (
+                  <p className="mt-2 text-sm font-medium text-warn">
+                    Abaixo de 1.000 kcal por dia não é seguro sem acompanhamento profissional.
+                  </p>
+                ) : null}
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-ink-2">Meta não alcançável nesse prazo.</p>
+            )}
+          </section>
+        ) : null}
 
         <footer className="relatorio-secao mt-8 border-t border-border pt-5 text-sm text-ink-3">
           <p>Ferramenta educativa. Não substitui avaliação com nutricionista.</p>

@@ -20,6 +20,11 @@ export function formatarKg(n: number, casas = 1): string {
 }
 
 /** Formata número com sinal explícito: "+250" / "−250" / "0". */
+/** "1 ano" para 52 semanas; senão "N semanas". Usado em tela e relatório para o mesmo texto. */
+export function rotuloSemanas(semanas: number): string {
+  return semanas === 52 ? '1 ano' : `${semanas} semanas`
+}
+
 export function formatarSinal(n: number, casas = 0): string {
   const fator = 10 ** casas
   const arredondado = Math.round(n * fator) / fator

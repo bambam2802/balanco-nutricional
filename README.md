@@ -2,6 +2,8 @@
 
 Calcula VET, classifica IMC (adulto e idoso) e risco cardiovascular, monta um dia alimentar por fotos, compara com o VET e projeta o peso. Gera relatório para impressão ou PDF. Tudo roda no navegador, sem cadastro nem servidor.
 
+A projeção de peso usa o modelo dinâmico de Hall et al. (Lancet, 2011), o mesmo do Body Weight Planner do NIDDK, ao lado da regra simples de 7.700 kcal por kg, para mostrar por que a mudança de peso desacelera. O passo 4 também tem um modo meta: peso-alvo e prazo viram a ingestão diária necessária.
+
 ## Abrir sem instalar nada (jeito mais simples para a feira)
 
 Rode uma vez `npm run build` (ou use o arquivo já gerado). Ele cria **um único arquivo** `dist/index.html`, com tudo dentro. Basta copiar esse arquivo para qualquer notebook ou pendrive e abrir com dois cliques no Chrome ou Edge. Não precisa de servidor nem de internet, exceto para carregar as fotos dos pratos (sem internet aparece um ícone no lugar da foto).

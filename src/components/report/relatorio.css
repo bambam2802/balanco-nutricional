@@ -48,6 +48,7 @@
     width: 100% !important;
   }
   .relatorio-svg svg {
-    max-height: 200px;
+    /* Legenda abaixo do gráfico (duas séries) soma ~20px; reduz o SVG para caber em 2 páginas. */
+    max-height: 180px;
   }
 }

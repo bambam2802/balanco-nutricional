@@ -1,19 +1,21 @@
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, FileText } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { ArrowLeft, ExternalLink, FileText, Target } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAvaliacao } from '../../state/avaliacao'
 import { calcularVET } from '../../domain/tmb'
 import { somarCalorias, classificarBalanco } from '../../domain/balanco'
 import { projetarPeso } from '../../domain/projecao'
-import { formatarKcal, formatarKg, formatarSinal } from '../../domain/formatar'
+import { projetarPesoHall, caloriasParaMeta, type EntradaHall } from '../../domain/hall'
+import { formatarKcal, formatarKg, formatarNumero, formatarSinal, rotuloSemanas } from '../../domain/formatar'
 import { REFEICOES } from '../../data/refeicoes'
 import type { ClassificacaoBalanco } from '../../domain/types'
 import type { BadgeTone } from '../ui/Badge'
-import type { TomProjecao } from '../charts/ProjecaoChart'
+import type { TomProjecao, SerieProjecao } from '../charts/ProjecaoChart'
 import { Card, CardTitle } from '../ui/Card'
 import { Badge } from '../ui/Badge'
 import { Callout } from '../ui/Callout'
 import { SegmentedControl } from '../ui/SegmentedControl'
+import { NumberField } from '../ui/NumberField'
 import { Button } from '../ui/Button'
 import { ProjecaoChart } from '../charts/ProjecaoChart'
 import { ResumoRefeicoes } from '../report/ResumoRefeicoes'
@@ -48,13 +50,38 @@ const EXPLICACAO: Record<ClassificacaoBalanco, string> = {
   superavit: 'Come mais do que gasta: tendência de ganhar peso',
 }
 
-type OpcaoSemana = '4' | '12' | '24'
+type OpcaoSemana = '4' | '12' | '24' | '52'
+
+function rotuloHorizonte(op: OpcaoSemana): string {
+  return rotuloSemanas(Number(op))
+}
 
 const OPCOES_SEMANA: { value: OpcaoSemana; label: string }[] = [
-  { value: '4', label: '4 semanas' },
-  { value: '12', label: '12 semanas' },
-  { value: '24', label: '24 semanas' },
+  { value: '4', label: rotuloHorizonte('4') },
+  { value: '12', label: rotuloHorizonte('12') },
+  { value: '24', label: rotuloHorizonte('24') },
+  { value: '52', label: rotuloHorizonte('52') },
 ]
+
+type OpcaoPrazoMeta = '12' | '24' | '52'
+
+const OPCOES_PRAZO_META: { value: OpcaoPrazoMeta; label: string }[] = [
+  { value: '12', label: rotuloHorizonte('12') },
+  { value: '24', label: rotuloHorizonte('24') },
+  { value: '52', label: rotuloHorizonte('52') },
+]
+
+/** Converte string com vírgula ou ponto decimal para número. `null` se inválido/vazio. */
+function paraNumero(valor: string): number | null {
+  const limpo = valor.trim().replace(',', '.')
+  if (limpo === '') return null
+  const n = Number(limpo)
+  return Number.isFinite(n) ? n : null
+}
+
+function paraTexto(n: number | undefined): string {
+  return n != null ? String(n).replace('.', ',') : ''
+}
 
 function BarraComparativa({
   rotulo,
@@ -91,7 +118,15 @@ export function StepBalanco() {
   const dados = estado.dados
   const [semanas, setSemanas] = useState<OpcaoSemana>('12')
 
-  const vet = useMemo(() => (dados ? calcularVET(dados, estado.equacao).vet : 0), [dados, estado.equacao])
+  const [metaAberta, setMetaAberta] = useState(estado.meta !== null)
+  const [pesoAlvoStr, setPesoAlvoStr] = useState(() => paraTexto(estado.meta?.pesoKg ?? dados?.pesoKg))
+  const [prazoMeta, setPrazoMeta] = useState<OpcaoPrazoMeta>(() =>
+    estado.meta?.semanas === 12 || estado.meta?.semanas === 52 ? String(estado.meta.semanas) as OpcaoPrazoMeta : '24',
+  )
+  const [erroPesoAlvo, setErroPesoAlvo] = useState<string | undefined>(undefined)
+
+  const resultadoVet = useMemo(() => (dados ? calcularVET(dados, estado.equacao) : null), [dados, estado.equacao])
+  const vet = resultadoVet?.vet ?? 0
   const ingerido = useMemo(() => somarCalorias(estado.escolhas, REFEICOES), [estado.escolhas])
   const balanco = useMemo(() => classificarBalanco(vet, ingerido), [vet, ingerido])
   const todasAusentes = useMemo(
@@ -99,10 +134,54 @@ export function StepBalanco() {
     [estado.escolhas],
   )
 
-  const projecao = useMemo(
+  const entradaHall = useMemo<EntradaHall | null>(() => {
+    if (!dados || !resultadoVet) return null
+    return {
+      sexo: dados.sexo,
+      idade: dados.idade,
+      pesoKg: dados.pesoKg,
+      alturaCm: dados.alturaCm,
+      tmbKcal: resultadoVet.tmb,
+      vetKcal: resultadoVet.vet,
+      gorduraPct: dados.gorduraPct,
+    }
+  }, [dados, resultadoVet])
+
+  const projecaoHall = useMemo(
+    () => (entradaHall ? projetarPesoHall(entradaHall, ingerido, Number(semanas)) : null),
+    [entradaHall, ingerido, semanas],
+  )
+
+  const projecaoLinear = useMemo(
     () => (dados ? projetarPeso(dados.pesoKg, balanco.diferenca, Number(semanas)) : null),
     [dados, balanco.diferenca, semanas],
   )
+
+  const seriesProjecao = useMemo<SerieProjecao[]>(() => {
+    if (!projecaoHall || !projecaoLinear) return []
+    return [
+      { id: 'hall', rotulo: 'Modelo dinâmico', pontos: projecaoHall.pontos, tom: TOM[balanco.classificacao], estilo: 'solida' },
+      {
+        id: 'linear',
+        rotulo: 'Regra simples (7.700 kcal = 1 kg)',
+        pontos: projecaoLinear.pontos,
+        tom: 'neutro',
+        estilo: 'tracejada',
+      },
+    ]
+  }, [projecaoHall, projecaoLinear, balanco.classificacao])
+
+  const pesoAlvoNum = useMemo(() => paraNumero(pesoAlvoStr), [pesoAlvoStr])
+
+  const resultadoMeta = useMemo(() => {
+    if (!entradaHall || pesoAlvoNum === null || pesoAlvoNum < 20 || pesoAlvoNum > 300) return null
+    return caloriasParaMeta(entradaHall, pesoAlvoNum, Number(prazoMeta))
+  }, [entradaHall, pesoAlvoNum, prazoMeta])
+
+  useEffect(() => {
+    if (!metaAberta || pesoAlvoNum === null || pesoAlvoNum < 20 || pesoAlvoNum > 300) return
+    dispatch({ type: 'definirMeta', meta: { pesoKg: pesoAlvoNum, semanas: Number(prazoMeta) } })
+  }, [metaAberta, pesoAlvoNum, prazoMeta, dispatch])
 
   if (!dados) {
     return (
@@ -132,13 +211,31 @@ export function StepBalanco() {
     )
   }
 
-  const tom = TOM[balanco.classificacao]
   const maior = Math.max(ingerido, vet)
 
   function onEditarRefeicao(indice: number) {
     dispatch({ type: 'irParaRefeicao', indice })
     dispatch({ type: 'irPara', passo: 'refeicoes' })
   }
+
+  function validarPesoAlvo() {
+    if (pesoAlvoNum === null || pesoAlvoNum < 20 || pesoAlvoNum > 300) {
+      setErroPesoAlvo('Informe o peso-alvo em quilos, entre 20 e 300')
+    } else {
+      setErroPesoAlvo(undefined)
+    }
+  }
+
+  function removerMeta() {
+    dispatch({ type: 'definirMeta', meta: null })
+    setMetaAberta(false)
+    setPesoAlvoStr(paraTexto(dados?.pesoKg))
+    setPrazoMeta('24')
+    setErroPesoAlvo(undefined)
+  }
+
+  const diffMetaKcal =
+    resultadoMeta?.alcancavel && resultadoMeta.kcalDia != null ? Math.round(resultadoMeta.kcalDia) - ingerido : null
 
   return (
     <div className="flex flex-col gap-6">
@@ -176,7 +273,7 @@ export function StepBalanco() {
         </div>
       </Card>
 
-      {projecao ? (
+      {projecaoHall && projecaoLinear ? (
         <Card>
           <CardTitle>Se esse dia se repetir</CardTitle>
 
@@ -190,29 +287,46 @@ export function StepBalanco() {
           </div>
 
           <div className="mt-5">
-            <ProjecaoChart pontos={projecao.pontos} tom={tom} pesoInicial={dados.pesoKg} />
+            <ProjecaoChart series={seriesProjecao} pesoInicial={dados.pesoKg} semanasRotulo={Number(semanas)} />
           </div>
 
           <p className="font-display mt-4 text-lg font-semibold text-ink">
-            Em {semanas} semanas:{' '}
+            Em {rotuloHorizonte(semanas)}:{' '}
             {balanco.classificacao === 'normocalorico' ? (
-              <>tendência de manter {formatarKg(projecao.pesoFinalKg)}</>
+              <>
+                tendência de manter <span className="num">{formatarKg(projecaoHall.pesoFinalKg)}</span>
+              </>
             ) : (
               <>
-                {formatarKg(projecao.pesoFinalKg)} ({formatarSinal(projecao.deltaKg, 1)} kg)
+                <span className="num">{formatarKg(projecaoHall.pesoFinalKg)}</span> (
+                <span className="num">{formatarSinal(projecaoHall.deltaKg, 1)} kg</span>)
               </>
-            )}
+            )}{' '}
+            pelo modelo dinâmico
+          </p>
+          <p className="mt-1 text-sm text-ink-2">
+            Regra simples: <span className="num">{formatarKg(projecaoLinear.pesoFinalKg)}</span>
           </p>
 
-          {projecao.ritmoAcelerado ? (
+          {projecaoHall.ritmoAcelerado ? (
             <Callout tone="warn" className="mt-3">
               Ritmo acima de 1 kg por semana não é recomendado; esta é só uma estimativa.
             </Callout>
           ) : null}
 
-          <p className="mt-4 flex items-start gap-1 text-xs text-ink-3">
-            Estimativa linear simplificada: 7.700 kcal ≈ 1 kg de gordura corporal. Para uma simulação
-            dinâmica, veja o{' '}
+          <p className="mt-3 text-sm text-ink-2">
+            Gordura corporal {dados.gorduraPct != null ? 'medida' : 'estimada'}:{' '}
+            <span className="num">{formatarNumero(projecaoHall.gorduraPctInicial, 0)}%</span> →{' '}
+            <span className="num">{formatarNumero(projecaoHall.gorduraPctFinal, 0)}%</span>
+          </p>
+
+          <p className="mt-2 text-sm text-ink-2">
+            O corpo se adapta: quanto menos você pesa, menos gasta, por isso a mudança desacelera com o
+            tempo.
+          </p>
+
+          <p className="mt-4 text-xs text-ink-3">
+            Modelo de Hall et al. (2011), o mesmo do{' '}
             <a
               href="https://www.niddk.nih.gov/bwp"
               target="_blank"
@@ -222,9 +336,111 @@ export function StepBalanco() {
               Body Weight Planner do NIDDK
               <ExternalLink size={12} className="ml-0.5 inline-block align-[-1px]" />
             </a>
+            . Estimativa educativa.
+            {dados.idade < 18 ? ' Estimativa de gordura corporal feita para adultos.' : ''}
           </p>
         </Card>
       ) : null}
+
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CardTitle>Meta</CardTitle>
+          {metaAberta ? (
+            <Button variant="ghost" onClick={removerMeta}>
+              Remover meta
+            </Button>
+          ) : null}
+        </div>
+
+        {!metaAberta ? (
+          <div className="mt-3">
+            <p className="text-sm text-ink-2">E se você tiver uma meta?</p>
+            <Button
+              variant="secondary"
+              className="mt-3"
+              iconLeft={<Target size={18} />}
+              onClick={() => setMetaAberta(true)}
+            >
+              Definir meta de peso
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-4 flex flex-col gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <NumberField
+                label="Peso-alvo"
+                unit="kg"
+                inputMode="decimal"
+                min={20}
+                max={300}
+                value={pesoAlvoStr}
+                onChange={setPesoAlvoStr}
+                onBlur={validarPesoAlvo}
+                error={erroPesoAlvo}
+              />
+              <div>
+                <span className="mb-1.5 block text-sm font-medium text-ink-2">Prazo</span>
+                <SegmentedControl<OpcaoPrazoMeta>
+                  ariaLabel="Prazo da meta"
+                  full
+                  value={prazoMeta}
+                  onChange={setPrazoMeta}
+                  options={OPCOES_PRAZO_META}
+                />
+              </div>
+            </div>
+
+            {resultadoMeta ? (
+              <div>
+                {!resultadoMeta.alcancavel ? (
+                  <Callout tone="warn">
+                    Essa meta não é alcançável nesse prazo, nem com ingestão zero. Tente um prazo maior.
+                  </Callout>
+                ) : pesoAlvoNum === dados.pesoKg ? (
+                  <p className="font-display text-base font-semibold text-ink sm:text-lg">
+                    Para manter o peso atual: cerca de{' '}
+                    <span className="num">{formatarKcal(Math.round(resultadoMeta.kcalDia!))}</span>/dia
+                  </p>
+                ) : (
+                  <>
+                    <p className="font-display text-base font-semibold text-ink sm:text-lg">
+                      Para chegar a <span className="num">{formatarKg(pesoAlvoNum!)}</span> em{' '}
+                      {rotuloHorizonte(prazoMeta)}: cerca de{' '}
+                      <span className="num">{formatarKcal(Math.round(resultadoMeta.kcalDia!))}</span>/dia
+                    </p>
+                    <p className="mt-1 text-sm text-ink-2">
+                      Depois, para manter <span className="num">{formatarKg(pesoAlvoNum!)}</span>: cerca de{' '}
+                      <span className="num">{formatarKcal(Math.round(resultadoMeta.kcalManterAlvo!))}</span>
+                      /dia
+                    </p>
+                  </>
+                )}
+
+                {resultadoMeta.alcancavel && diffMetaKcal !== null ? (
+                  <p className="mt-2 text-sm text-ink-2">
+                    Hoje você ingere cerca de <span className="num">{formatarKcal(ingerido)}</span> por dia
+                    {diffMetaKcal === 0 ? (
+                      ', exatamente o necessário'
+                    ) : (
+                      <>
+                        , <span className="num">{formatarKcal(Math.abs(diffMetaKcal))}</span>{' '}
+                        {diffMetaKcal < 0 ? 'a mais' : 'a menos'} que o necessário
+                      </>
+                    )}
+                    .
+                  </p>
+                ) : null}
+
+                {resultadoMeta.abaixoSeguro ? (
+                  <Callout tone="warn" className="mt-3">
+                    Abaixo de 1.000 kcal por dia não é seguro sem acompanhamento profissional.
+                  </Callout>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </Card>
 
       <Card>
         <CardTitle>Seu dia alimentar</CardTitle>

@@ -21,7 +21,9 @@ Ferramenta educativa para feira pública de Nutrição: calcula VET, classifica 
 - **IMC**: adulto 18–59 pela OMS; **idoso ≥ 60 por Lipschitz (1994)**: < 22 baixo peso, 22–27 eutrofia, > 27 sobrepeso. Menor de 18: calcula, não classifica.
 - **Risco CV**: cintura (OMS) mulher ≥ 80 / ≥ 88 cm, homem ≥ 94 / ≥ 102 cm; RCQ (OMS) mulher > 0,85, homem > 0,90.
 - **Balanço**: normocalórico quando |ingerido − VET| ≤ 5 % do VET.
-- **Projeção**: 7700 kcal = 1 kg, linear; avisar quando |ritmo| > 1 kg/semana.
+- **Projeção linear (referência)**: 7700 kcal = 1 kg; aparece tracejada como "regra simples".
+- **Projeção dinâmica (principal)**: modelo de Hall et al. (Lancet 2011), replicado do JavaScript público do NIDDK Body Weight Planner em `src/domain/hall.ts` (RK4 diário; gordura/massa magra com partição de Forbes; gasto = K + 22·L + 3,2·F + δ·peso + termogênese adaptativa + 10 % TEF; glicogênio com 3,7 kg de água por kg; fluido extracelular por sódio proporcional à ingestão). Baseline: VET = ingestão de manutenção, TMB da equação escolhida como RMR, δ = (0,9·VET − TMB)/peso. Gordura inicial: informada (1–70 %) ou Jackson 2002 (clamp 0–60 %). Os testes em `hall.test.ts` comparam com valores gerados pelo JS original (±0,01 kg): não altere constantes sem regenerar os valores-ouro (`scratchpad/bwp-golden.mjs`).
+- **Meta**: peso-alvo + prazo → ingestão diária por bissecção (passo 200 kcal, tolerância 1 g) e ingestão de manutenção no alvo; avisar abaixo de 1000 kcal/dia e quando inalcançável.
 
 ## Convenções
 
