@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useReducer, type ReactNode } from 'react'
-import { ESTADO_INICIAL, reducer, type AcaoAvaliacao, type EstadoAvaliacao } from './reducer'
+import { ESTADO_INICIAL, reducer, sanitizarEstado, type AcaoAvaliacao, type EstadoAvaliacao } from './reducer'
 
 export type { AcaoAvaliacao, EstadoAvaliacao, Passo } from './reducer'
 
@@ -9,8 +9,7 @@ function carregar(): EstadoAvaliacao {
   try {
     const bruto = sessionStorage.getItem(CHAVE_STORAGE)
     if (!bruto) return ESTADO_INICIAL
-    const salvo = JSON.parse(bruto) as Partial<EstadoAvaliacao>
-    return { ...ESTADO_INICIAL, ...salvo }
+    return sanitizarEstado(JSON.parse(bruto))
   } catch {
     return ESTADO_INICIAL
   }

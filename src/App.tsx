@@ -5,6 +5,7 @@ import { StepResultados } from './components/steps/StepResultados'
 import { StepRefeicoes } from './components/steps/StepRefeicoes'
 import { StepBalanco } from './components/steps/StepBalanco'
 import { Relatorio } from './components/report/Relatorio'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function Roteador() {
   const { estado } = useAvaliacao()
@@ -20,6 +21,8 @@ function Roteador() {
       return <StepBalanco />
     case 'relatorio':
       return <Relatorio />
+    default:
+      return <StepDados />
   }
 }
 
@@ -35,8 +38,10 @@ function Shell() {
 
 export default function App() {
   return (
-    <AvaliacaoProvider>
-      <Shell />
-    </AvaliacaoProvider>
+    <ErrorBoundary>
+      <AvaliacaoProvider>
+        <Shell />
+      </AvaliacaoProvider>
+    </ErrorBoundary>
   )
 }

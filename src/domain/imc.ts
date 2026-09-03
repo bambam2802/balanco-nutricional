@@ -24,6 +24,7 @@ export const FAIXAS_IMC_IDOSO: FaixaIMC[] = [
 
 /** IMC = peso (kg) / altura (m)². Valor bruto, sem arredondar — quem exibe arredonda. */
 export function calcularIMC(pesoKg: number, alturaCm: number): number {
+  if (!Number.isFinite(pesoKg) || !Number.isFinite(alturaCm) || alturaCm <= 0 || pesoKg <= 0) return NaN
   const alturaM = alturaCm / 100
   return pesoKg / (alturaM * alturaM)
 }
@@ -36,6 +37,16 @@ export function calcularIMC(pesoKg: number, alturaCm: number): number {
  *   só valores estritamente acima de 27 são sobrepeso (comparação `> 27`).
  */
 export function classificarIMC(imc: number, idade: number): ResultadoIMC {
+  if (!Number.isFinite(imc)) {
+    return {
+      imc,
+      classificacao: 'sem_classificacao',
+      rotulo: 'Sem classificação (peso ou altura inválidos)',
+      protocolo: 'nenhum',
+      faixas: [],
+    }
+  }
+
   if (idade < 18) {
     return {
       imc,

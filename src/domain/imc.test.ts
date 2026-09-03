@@ -62,3 +62,13 @@ describe('classificarIMC — menor de 18 anos', () => {
     expect(r.faixas).toEqual([])
   })
 })
+
+describe('IMC com dados inválidos', () => {
+  it('altura zero não vira obesidade: retorna NaN e sem classificação', () => {
+    const imc = calcularIMC(70, 0)
+    expect(Number.isNaN(imc)).toBe(true)
+    const r = classificarIMC(imc, 30)
+    expect(r.classificacao).toBe('sem_classificacao')
+    expect(r.protocolo).toBe('nenhum')
+  })
+})
