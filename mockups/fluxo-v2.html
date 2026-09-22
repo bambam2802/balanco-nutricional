@@ -1,0 +1,1529 @@
+<title>Balanço Nutricional v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground: #F3F6F4;
+    --surface: #FFFFFF;
+    --surface-2: #EAEFEC;
+    --line: #DCE4E0;
+    --line-forte: #C3CFC9;
+    --ink: #0B1310;
+    --ink-2: #5C6E66;
+    --ink-3: #8A9A93;
+    --accent: #00875A;
+    --accent-viva: #00C983;
+    --accent-tinta: #04150E;
+    --accent-soft: rgba(0, 201, 131, .12);
+    --accent-ring: rgba(0, 201, 131, .35);
+    --warn: #A96500;
+    --warn-soft: rgba(169, 101, 0, .12);
+    --danger: #BE3A31;
+    --danger-soft: rgba(190, 58, 49, .12);
+    --info: #4478D8;
+    --sombra: 0 1px 2px rgba(11, 19, 16, .04), 0 12px 32px -18px rgba(11, 19, 16, .28);
+    --sombra-alta: 0 2px 4px rgba(11, 19, 16, .05), 0 28px 60px -28px rgba(11, 19, 16, .35);
+    --grade: rgba(11, 19, 16, .045);
+    --brilho: 0 0 0 1px var(--accent-ring), 0 0 34px -6px var(--accent-ring);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #070B0A;
+      --surface: #0E1513;
+      --surface-2: #16201C;
+      --line: #202D28;
+      --line-forte: #2E4038;
+      --ink: #E9F2EE;
+      --ink-2: #8DA398;
+      --ink-3: #64796F;
+      --accent: #2BE39A;
+      --accent-viva: #2BE39A;
+      --accent-tinta: #04150E;
+      --accent-soft: rgba(43, 227, 154, .12);
+      --accent-ring: rgba(43, 227, 154, .32);
+      --warn: #E9A13B;
+      --warn-soft: rgba(233, 161, 59, .14);
+      --danger: #FF6F62;
+      --danger-soft: rgba(255, 111, 98, .14);
+      --info: #6FA0FF;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 16px 40px -22px rgba(0, 0, 0, .9);
+      --sombra-alta: 0 2px 6px rgba(0, 0, 0, .55), 0 34px 70px -30px rgba(0, 0, 0, .95);
+      --grade: rgba(233, 242, 238, .05);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #070B0A;
+    --surface: #0E1513;
+    --surface-2: #16201C;
+    --line: #202D28;
+    --line-forte: #2E4038;
+    --ink: #E9F2EE;
+    --ink-2: #8DA398;
+    --ink-3: #64796F;
+    --accent: #2BE39A;
+    --accent-viva: #2BE39A;
+    --accent-tinta: #04150E;
+    --accent-soft: rgba(43, 227, 154, .12);
+    --accent-ring: rgba(43, 227, 154, .32);
+    --warn: #E9A13B;
+    --warn-soft: rgba(233, 161, 59, .14);
+    --danger: #FF6F62;
+    --danger-soft: rgba(255, 111, 98, .14);
+    --info: #6FA0FF;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 16px 40px -22px rgba(0, 0, 0, .9);
+    --sombra-alta: 0 2px 6px rgba(0, 0, 0, .55), 0 34px 70px -30px rgba(0, 0, 0, .95);
+    --grade: rgba(233, 242, 238, .05);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .fundo {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(to right, var(--grade) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grade) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(120% 90% at 70% 0%, #000 0%, transparent 72%);
+  }
+
+  .app { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 0 24px 90px; }
+
+  /* ---------- topo ---------- */
+  .topo { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0 16px; }
+  .marca { display: flex; align-items: center; gap: 11px; }
+  .marca-selo {
+    width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px;
+    background: linear-gradient(150deg, var(--accent-viva), var(--accent));
+    box-shadow: 0 6px 18px -8px var(--accent-ring);
+  }
+  .marca-nome { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -.02em; }
+  .topo-dir { display: flex; align-items: center; gap: 10px; }
+  .selo-proto {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-2); border: 1px dashed var(--line-forte); border-radius: 999px; padding: 4px 10px;
+  }
+  .btn-tema {
+    display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 13px;
+    color: var(--ink-2); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 13px 6px 10px; cursor: pointer;
+    transition: color .2s, border-color .2s, transform .2s;
+  }
+  .btn-tema:hover { color: var(--ink); border-color: var(--line-forte); transform: translateY(-1px); }
+
+  /* ---------- etapas ---------- */
+  .etapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 4px 0 30px; }
+  .etapa {
+    display: grid; gap: 8px; text-align: left; font: inherit;
+    background: transparent; border: 0; padding: 0; cursor: pointer;
+  }
+  .etapa-barra { height: 3px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .etapa-barra i {
+    display: block; height: 100%; width: var(--p, 0%); border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), var(--accent-viva));
+    transition: width .55s cubic-bezier(.22, .8, .24, 1);
+  }
+  .etapa-nome {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-3); transition: color .25s;
+  }
+  .etapa[aria-current="step"] .etapa-nome { color: var(--ink); }
+  .etapa:hover .etapa-nome { color: var(--ink-2); }
+
+  /* ---------- palco ---------- */
+  .palco { display: grid; grid-template-columns: minmax(0, 1.34fr) minmax(330px, .66fr); gap: 38px; align-items: start; }
+  .coluna { display: grid; gap: 22px; align-content: start; min-width: 0; }
+
+  .passo { display: grid; gap: 22px; animation: entrar .34s cubic-bezier(.22, .8, .24, 1) both; }
+  .passo[hidden] { display: none !important; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .abertura { display: grid; gap: 10px; max-width: 30ch; }
+  .sobrescrito {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px;
+  }
+  .sobrescrito::before { content: ""; width: 18px; height: 1px; background: currentColor; }
+
+  h1 {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700;
+    font-size: clamp(30px, 3.4vw, 44px); line-height: 1.02; letter-spacing: -.045em;
+    text-wrap: balance; margin: 0;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lide { color: var(--ink-2); font-size: 15.5px; max-width: 48ch; margin: 0; }
+
+  .rot {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+
+  .bloco {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: 18px 20px 20px; box-shadow: var(--sombra);
+  }
+  .bloco-cab { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600;
+    border-radius: 999px; padding: 4px 11px; background: var(--surface-2); color: var(--ink-2);
+  }
+  .chip[data-estado="bom"] { background: var(--accent-soft); color: var(--accent); }
+  .chip[data-estado="alerta"] { background: var(--warn-soft); color: var(--warn); }
+  .chip[data-estado="risco"] { background: var(--danger-soft); color: var(--danger); }
+  .chip[data-estado="info"] { background: rgba(68, 120, 216, .12); color: var(--info); }
+
+  .numero {
+    font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600;
+    letter-spacing: -.04em; font-variant-numeric: tabular-nums; line-height: 1;
+  }
+
+  /* ---------- passo 1: instrumentos ---------- */
+  .ditado {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+    box-shadow: var(--sombra); padding: 16px; display: grid; gap: 13px;
+    position: relative; overflow: hidden; transition: border-color .25s, box-shadow .25s;
+  }
+  .ditado:focus-within { border-color: var(--accent-ring); box-shadow: var(--brilho); }
+  .ditado-topo {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .ditado-topo b { color: var(--ink-2); font-weight: 500; }
+  .ditado-linha { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-radius: 13px; padding: 4px 4px 4px 14px; }
+  .ditado-linha svg { flex: none; color: var(--accent); }
+  #frase {
+    flex: 1 1 auto; min-width: 0; font: inherit; font-size: 15.5px; color: var(--ink);
+    background: transparent; border: 0; padding: 12px 0; outline: none;
+  }
+  #frase::placeholder { color: var(--ink-3); }
+  .btn-ler {
+    flex: none; font: inherit; font-weight: 600; font-size: 14px; color: var(--accent-tinta);
+    background: linear-gradient(145deg, var(--accent-viva), var(--accent)); border: 0;
+    border-radius: 10px; padding: 11px 18px; cursor: pointer;
+    transition: transform .18s cubic-bezier(.2, .8, .2, 1), box-shadow .18s, filter .18s;
+  }
+  .btn-ler:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -12px var(--accent-ring); }
+  .btn-ler[data-lendo="1"] { filter: saturate(.6); pointer-events: none; }
+  .exemplos { display: flex; flex-wrap: wrap; gap: 7px; }
+  .exemplo {
+    font: inherit; font-size: 12.5px; color: var(--ink-2); background: transparent;
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer;
+    transition: color .18s, border-color .18s, background .18s;
+  }
+  .exemplo:hover { color: var(--ink); border-color: var(--accent-ring); background: var(--accent-soft); }
+  .lidos { display: flex; flex-wrap: wrap; gap: 6px; }
+  .lidos:empty { display: none; }
+  .lido {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--accent);
+    background: var(--accent-soft); border-radius: 7px; padding: 4px 8px;
+    animation: surgir .34s cubic-bezier(.2, .8, .2, 1) both;
+  }
+  .lido b { color: var(--ink); font-weight: 500; }
+  @keyframes surgir { from { opacity: 0; transform: translateY(6px) scale(.96); } to { opacity: 1; transform: none; } }
+  .ditado::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: linear-gradient(100deg, transparent 35%, var(--accent-soft) 50%, transparent 65%);
+    transform: translateX(-100%);
+  }
+  .ditado[data-lendo="1"]::after { opacity: 1; animation: varrer 1s cubic-bezier(.4, 0, .2, 1) infinite; }
+  @keyframes varrer { to { transform: translateX(100%); } }
+
+  .inst { transition: border-color .3s, box-shadow .3s, transform .3s; }
+  .inst[data-acende="1"] { border-color: var(--accent-ring); box-shadow: var(--brilho); transform: translateY(-2px); }
+  .rot-obr { color: var(--accent); }
+  .leitura { display: flex; align-items: baseline; gap: 6px; font-family: "Bricolage Grotesque", system-ui, sans-serif; letter-spacing: -.04em; line-height: 1; }
+  .leitura output { font-size: 38px; font-weight: 600; font-variant-numeric: tabular-nums; transition: color .3s; }
+  .inst[data-acende="1"] .leitura output { color: var(--accent); }
+  .leitura .un { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0; color: var(--ink-3); }
+
+  .trilho { position: relative; height: 42px; border-radius: 12px; background: var(--surface-2); overflow: hidden; cursor: grab; }
+  .trilho:active { cursor: grabbing; }
+  .ticks { position: absolute; inset: 0; background-image: linear-gradient(90deg, var(--line-forte) 0 1px, transparent 1px); background-size: calc(100% / 24) 100%; opacity: .55; }
+  .ticks::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(90deg, var(--line-forte) 0 1px, transparent 1px); background-size: calc(100% / 6) 100%; opacity: .9; }
+  .preenchido { position: absolute; inset: 0 auto 0 0; width: var(--pct, 50%); background: var(--accent-soft); border-right: 2px solid var(--accent); }
+  .agulha { position: absolute; top: 6px; bottom: 6px; left: var(--pct, 50%); width: 10px; margin-left: -5px; border-radius: 5px; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); pointer-events: none; }
+  .trilho[data-suave="1"] .preenchido, .trilho[data-suave="1"] .agulha { transition: width .55s cubic-bezier(.22, .8, .24, 1), left .55s cubic-bezier(.22, .8, .24, 1); }
+  .trilho input[type="range"] { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: inherit; }
+  .trilho:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .escala { display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--ink-3); padding-top: 7px; }
+
+  .duo { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 13px; padding: 4px; gap: 4px; }
+  .duo::before {
+    content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 6px);
+    border-radius: 10px; background: var(--surface); box-shadow: var(--sombra);
+    transform: translateX(var(--x, 0%)); transition: transform .38s cubic-bezier(.22, .9, .24, 1);
+  }
+  .duo button { position: relative; font: inherit; font-weight: 500; color: var(--ink-3); background: transparent; border: 0; border-radius: 10px; padding: 12px 8px; cursor: pointer; transition: color .25s; }
+  .duo button[aria-pressed="true"] { color: var(--ink); }
+
+  .atividades { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  .ativ {
+    display: grid; gap: 9px; justify-items: start; text-align: left; font: inherit; color: var(--ink-2);
+    background: var(--surface-2); border: 1px solid transparent; border-radius: 13px;
+    padding: 12px 11px 11px; cursor: pointer;
+    transition: color .22s, background .22s, border-color .22s, transform .22s;
+  }
+  .ativ:hover { transform: translateY(-2px); color: var(--ink); }
+  .ativ[aria-pressed="true"] { color: var(--ink); background: var(--accent-soft); border-color: var(--accent-ring); }
+  .ativ-barras { display: flex; align-items: flex-end; gap: 3px; height: 20px; }
+  .ativ-barras i { width: 4px; border-radius: 2px; background: var(--line-forte); transition: background .22s; }
+  .ativ[aria-pressed="true"] .ativ-barras i.on { background: var(--accent); }
+  .ativ-nome { font-size: 13.5px; font-weight: 600; letter-spacing: -.01em; }
+  .ativ-fator { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .ativ[aria-pressed="true"] .ativ-fator { color: var(--accent); }
+
+  .op-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; font: inherit; color: var(--ink); background: transparent; border: 0; padding: 0; cursor: pointer; text-align: left; }
+  .op-titulo { display: grid; gap: 2px; }
+  .op-titulo span:last-child { font-size: 13px; color: var(--ink-2); }
+  .op-seta { transition: transform .35s cubic-bezier(.22, .8, .24, 1); color: var(--ink-3); }
+  .op-cab[aria-expanded="true"] .op-seta { transform: rotate(180deg); }
+  .op-corpo { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s cubic-bezier(.22, .8, .24, 1); }
+  .op-corpo[data-aberto="1"] { grid-template-rows: 1fr; }
+  .op-corpo > div { overflow: hidden; }
+  .op-grid { display: grid; gap: 18px; padding-top: 18px; }
+
+  /* ---------- passo 2: leitura ---------- */
+  .eqs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .eq-card {
+    display: grid; gap: 4px; text-align: left; font: inherit; cursor: pointer;
+    background: var(--surface-2); border: 1px solid transparent; border-radius: 14px; padding: 13px 14px 14px;
+    transition: border-color .22s, background .22s, transform .22s;
+  }
+  .eq-card:hover { transform: translateY(-2px); }
+  .eq-card[aria-pressed="true"] { border-color: var(--accent-ring); background: var(--accent-soft); }
+  .eq-card .eq-nome { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .eq-card .eq-val { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -.04em; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .eq-card[aria-pressed="true"] .eq-val { color: var(--accent); }
+  .eq-card .eq-nota { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--ink-3); }
+
+  .composicao { display: grid; gap: 8px; padding-top: 16px; }
+  .comp-barra { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
+  .comp-barra i { display: block; height: 100%; transition: width .5s cubic-bezier(.22, .8, .24, 1); }
+  .comp-tmb { background: var(--accent); }
+  .comp-ativ { background: var(--accent-soft); border-left: 1px solid var(--accent); }
+  .comp-legenda { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); }
+  .comp-legenda b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .ponto { display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 6px; vertical-align: 0; }
+
+  .imc-topo { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .imc-topo .numero { font-size: 46px; }
+  .faixa-imc { position: relative; margin-top: 20px; }
+  .faixa-barra { display: flex; height: 10px; border-radius: 999px; overflow: hidden; }
+  .faixa-barra i { display: block; height: 100%; }
+  .faixa-marcas { position: relative; height: 30px; margin-top: 6px; }
+  .faixa-marca {
+    position: absolute; top: 0; transform: translateX(-50%);
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--ink-3); white-space: nowrap;
+  }
+  .faixa-agulha {
+    position: absolute; top: -17px; left: var(--x, 50%); transform: translateX(-50%);
+    display: grid; justify-items: center; gap: 2px; transition: left .5s cubic-bezier(.22, .8, .24, 1);
+  }
+  .faixa-agulha i { width: 3px; height: 22px; border-radius: 2px; background: var(--ink); }
+
+  .fitas { display: grid; gap: 20px; }
+  .fita-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .fita-val { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .fita-trilho { position: relative; height: 8px; border-radius: 999px; background: var(--surface-2); margin-top: 12px; overflow: visible; }
+  .fita-zona { position: absolute; top: 0; bottom: 0; }
+  .fita-zona[data-z="ok"] { background: var(--accent); border-radius: 999px 0 0 999px; }
+  .fita-zona[data-z="alerta"] { background: var(--warn); }
+  .fita-zona[data-z="risco"] { background: var(--danger); border-radius: 0 999px 999px 0; }
+  .fita-marcador {
+    position: absolute; top: 50%; left: var(--x, 50%); width: 14px; height: 14px; margin: -7px 0 0 -7px;
+    border-radius: 50%; background: var(--surface); border: 3px solid var(--ink);
+    transition: left .5s cubic-bezier(.22, .8, .24, 1);
+  }
+  .fita-cortes { display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--ink-3); padding-top: 12px; }
+
+  /* ---------- passo 3: trilha do dia ---------- */
+  .trilha { display: grid; gap: 8px; }
+  .ref {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    overflow: hidden; transition: border-color .3s, box-shadow .3s, opacity .3s;
+  }
+  .ref[data-estado="ativa"] { border-color: var(--accent-ring); box-shadow: var(--brilho); }
+  .ref[data-estado="futura"] { opacity: .58; }
+  .ref-cab {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    font: inherit; color: inherit; background: transparent; border: 0; padding: 14px 16px; cursor: pointer;
+  }
+  .ref-hora {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--ink-3);
+    width: 40px; flex: none; font-variant-numeric: tabular-nums;
+  }
+  .ref-nome { font-weight: 600; font-size: 15px; letter-spacing: -.01em; flex: 1 1 auto; min-width: 0; }
+  .ref-escolha { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--ink-2); font-size: 13.5px; }
+  .ref-escolha img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; flex: none; background: var(--surface-2); }
+  .ref-kcal { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; flex: none; }
+  .ref[data-estado="feita"] .ref-kcal { color: var(--accent); }
+
+  .ref-corpo { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .42s cubic-bezier(.22, .8, .24, 1); }
+  .ref[data-estado="ativa"] .ref-corpo { grid-template-rows: 1fr; }
+  .ref-corpo > div { overflow: hidden; }
+  .ref-interior { padding: 2px 16px 16px; display: grid; gap: 10px; }
+
+  .opcoes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .op {
+    display: grid; gap: 0; text-align: left; font: inherit; color: inherit; cursor: pointer;
+    background: var(--surface-2); border: 1px solid transparent; border-radius: 14px; overflow: hidden;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+  }
+  .op:hover { transform: translateY(-3px); box-shadow: var(--sombra); }
+  .op[aria-pressed="true"] { border-color: var(--accent); }
+  .op-foto { position: relative; aspect-ratio: 4 / 3; background: var(--line); overflow: hidden; }
+  .op-foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.22, .8, .24, 1); }
+  .op:hover .op-foto img { transform: scale(1.05); }
+  .op-nivel {
+    position: absolute; left: 8px; bottom: 8px; display: flex; gap: 2px;
+    background: rgba(4, 21, 14, .58); border-radius: 999px; padding: 4px 7px; backdrop-filter: blur(6px);
+  }
+  .op-nivel i { width: 3px; height: 9px; border-radius: 2px; background: rgba(255, 255, 255, .35); }
+  .op-nivel i.on { background: #fff; }
+  .op-marca {
+    position: absolute; right: 8px; top: 8px; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-tinta); display: grid; place-items: center;
+    opacity: 0; transform: scale(.6); transition: opacity .2s, transform .25s cubic-bezier(.2, 1.4, .4, 1);
+  }
+  .op[aria-pressed="true"] .op-marca { opacity: 1; transform: none; }
+  .op-txt { padding: 10px 11px 12px; display: grid; gap: 5px; }
+  .op-nome { font-size: 13.5px; font-weight: 600; letter-spacing: -.01em; line-height: 1.25; }
+  .op-desc { font-size: 11.5px; color: var(--ink-3); line-height: 1.4; }
+  .op-kcal { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .op[aria-pressed="true"] .op-kcal { color: var(--accent); }
+
+  .pular {
+    font: inherit; font-size: 13px; color: var(--ink-3); background: transparent;
+    border: 1px dashed var(--line-forte); border-radius: 11px; padding: 9px 14px; cursor: pointer;
+    justify-self: start; transition: color .2s, border-color .2s;
+  }
+  .pular:hover { color: var(--ink-2); border-color: var(--ink-3); }
+  .pular[aria-pressed="true"] { color: var(--ink-2); border-style: solid; background: var(--surface-2); }
+
+  /* ---------- passo 4: balanço ---------- */
+  .veredito { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: clamp(24px, 2.6vw, 32px); font-weight: 600; letter-spacing: -.035em; line-height: 1.15; margin: 0; }
+  .veredito b { color: var(--accent); font-weight: 700; }
+  .veredito .gasto { color: var(--info); }
+
+  .horizontes { display: flex; gap: 6px; }
+  .hz {
+    font: inherit; font-size: 12.5px; color: var(--ink-2); background: var(--surface-2);
+    border: 1px solid transparent; border-radius: 9px; padding: 7px 12px; cursor: pointer;
+    transition: color .2s, background .2s, border-color .2s;
+  }
+  .hz[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-ring); }
+
+  .grafico { width: 100%; height: auto; display: block; margin-top: 6px; }
+  .g-eixo { stroke: var(--line); stroke-width: 1; }
+  .g-rot { fill: var(--ink-3); font-family: "IBM Plex Mono", monospace; font-size: 10px; }
+  .g-linear { stroke: var(--ink-3); stroke-width: 1.6; stroke-dasharray: 5 5; fill: none; }
+  .g-din { stroke: var(--accent); stroke-width: 2.6; fill: none; stroke-linecap: round; }
+  .g-area { fill: var(--accent-soft); }
+  .g-fim { fill: var(--accent); }
+  .g-fim-rot { fill: var(--accent); font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 13px; font-weight: 600; }
+  .legenda-g { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); padding-top: 8px; }
+  .legenda-g span { display: inline-flex; align-items: center; gap: 7px; }
+  .tracinho { width: 18px; height: 0; border-top: 2.6px solid var(--accent); }
+  .tracinho[data-tipo="linear"] { border-top: 1.6px dashed var(--ink-3); }
+
+  .cartoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding-top: 18px; }
+  .cartao { background: var(--surface-2); border-radius: 14px; padding: 13px 14px; display: grid; gap: 3px; }
+  .cartao .numero { font-size: 24px; }
+  .cartao .rot { font-size: 10px; }
+
+  /* ---------- monitor ---------- */
+  .monitor {
+    position: sticky; top: 18px; display: grid; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--sombra-alta); overflow: hidden;
+  }
+  .mon-secao { padding: 18px 20px; border-bottom: 1px solid var(--line); }
+  .mon-secao:last-child { border-bottom: 0; }
+  .mon-secao[hidden] { display: none; }
+  .mon-cab { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .pulso { display: inline-flex; align-items: center; gap: 7px; }
+  .pulso i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bater 2.4s ease-out infinite; }
+  @keyframes bater { 0% { box-shadow: 0 0 0 0 var(--accent-ring); } 60%, 100% { box-shadow: 0 0 0 9px transparent; } }
+
+  .vet { display: flex; align-items: baseline; gap: 8px; font-family: "Bricolage Grotesque", system-ui, sans-serif; letter-spacing: -.05em; line-height: .9; }
+  #vet { font-size: clamp(46px, 6vw, 60px); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .vet .un { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0; color: var(--ink-3); }
+  .vet-nota { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--ink-2); padding-top: 9px; font-variant-numeric: tabular-nums; }
+
+  .medidas-lista { display: grid; gap: 11px; }
+  .medida { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .medida-rot { display: grid; gap: 1px; }
+  .medida-rot b { font-weight: 500; font-size: 13.5px; }
+  .medida-rot span { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--ink-3); }
+  .medida-val { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 19px; font-weight: 600; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+
+  .soma-topo { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .soma-val { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .soma-alvo { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--ink-3); }
+  .soma-barra { position: relative; height: 10px; border-radius: 999px; background: var(--surface-2); margin-top: 12px; overflow: hidden; }
+  .soma-barra i { display: block; height: 100%; width: var(--p, 0%); background: linear-gradient(90deg, var(--accent), var(--accent-viva)); border-radius: inherit; transition: width .5s cubic-bezier(.22, .8, .24, 1); }
+  .soma-barra u { position: absolute; top: -3px; bottom: -3px; left: var(--alvo, 100%); width: 2px; background: var(--ink-2); }
+  .soma-lista { display: grid; gap: 7px; padding-top: 14px; }
+  .soma-item { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--ink-2); }
+  .soma-item i { width: 6px; height: 6px; border-radius: 2px; background: var(--line-forte); flex: none; }
+  .soma-item i.on { background: var(--accent); }
+  .soma-item span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .soma-item b { font-family: "IBM Plex Mono", monospace; font-weight: 400; font-variant-numeric: tabular-nums; color: var(--ink-3); }
+
+  .mon-rodape { display: grid; gap: 11px; background: var(--surface-2); }
+  .btn-avancar {
+    display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+    font: inherit; font-weight: 600; font-size: 15px; color: var(--accent-tinta);
+    background: linear-gradient(140deg, var(--accent-viva), var(--accent));
+    border: 0; border-radius: 13px; padding: 14px 18px; cursor: pointer;
+    transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s, filter .2s;
+  }
+  .btn-avancar:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -16px var(--accent-ring); }
+  .btn-avancar[disabled] { filter: grayscale(.7) opacity(.55); cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-avancar svg { transition: transform .25s; }
+  .btn-avancar:hover:not([disabled]) svg { transform: translateX(3px); }
+  .btn-voltar {
+    font: inherit; font-size: 13px; color: var(--ink-2); background: transparent; border: 0;
+    padding: 2px; cursor: pointer; justify-self: center;
+  }
+  .btn-voltar:hover { color: var(--ink); }
+  .nota-rodape { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; line-height: 1.6; color: var(--ink-3); text-align: center; margin: 0; }
+
+  /* ---------- relatório ---------- */
+  .folha-envolve { display: grid; gap: 14px; justify-items: center; }
+  .folha {
+    width: 100%; max-width: 720px; background: #FFFFFF; color: #10201A;
+    border-radius: 6px; padding: 40px 44px; box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .6);
+    font-size: 13px; line-height: 1.5;
+  }
+  .folha h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 26px; letter-spacing: -.03em; margin: 0 0 2px; }
+  .folha .f-sub { color: #5C6E66; font-size: 12px; margin: 0 0 22px; }
+  .folha .f-titulo { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #8A9A93; margin: 22px 0 10px; border-top: 1px solid #E4EAE7; padding-top: 14px; }
+  .folha .f-grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 20px; }
+  .folha .f-item span { display: block; font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #8A9A93; }
+  .folha .f-item b { font-weight: 600; font-size: 15px; }
+  .folha .f-lista { display: grid; gap: 7px; }
+  .folha .f-linha { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px dotted #DCE4E0; padding-bottom: 6px; }
+  .folha .f-total { display: flex; justify-content: space-between; font-weight: 700; padding-top: 4px; }
+  .folha .f-assina { margin-top: 26px; font-size: 12px; color: #5C6E66; }
+
+  .creditos { padding-top: 30px; font-size: 12.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 6px 16px; }
+
+  @media (max-width: 1040px) {
+    .palco { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+    .monitor { position: static; }
+    .atividades { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opcoes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .app { padding: 0 15px 70px; }
+    .etapa-nome { font-size: 9px; letter-spacing: .04em; }
+    .ditado-linha { flex-wrap: wrap; padding: 10px; }
+    #frase { flex-basis: 100%; padding: 4px 4px 10px; }
+    .btn-ler { width: 100%; }
+    .atividades { grid-template-columns: 1fr; }
+    .ativ { grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+    .eqs { grid-template-columns: 1fr; }
+    .cartoes { grid-template-columns: 1fr; }
+    .folha { padding: 26px 22px; }
+    .folha .f-grade { grid-template-columns: repeat(2, 1fr); }
+    .ref-escolha span { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+</style>
+
+<div class="fundo"></div>
+
+<div class="app">
+  <header class="topo">
+    <div class="marca">
+      <span class="marca-selo" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#04150E" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20c0-8 5-13 15-14 1 10-4 15-12 15H4z"></path><path d="M6 18c3-4 6-6 9-7"></path>
+        </svg>
+      </span>
+      <span class="marca-nome">Balanço Nutricional</span>
+    </div>
+    <div class="topo-dir">
+      <span class="selo-proto">protótipo v2</span>
+      <button class="btn-tema" id="btn-tema" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <span id="tema-nome">Escuro</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="etapas" id="etapas" aria-label="Etapas da avaliação">
+    <button class="etapa" type="button" data-ir="1" aria-current="false"><span class="etapa-barra"><i></i></span><span class="etapa-nome">1 · Aferição</span></button>
+    <button class="etapa" type="button" data-ir="2" aria-current="false"><span class="etapa-barra"><i></i></span><span class="etapa-nome">2 · Leitura</span></button>
+    <button class="etapa" type="button" data-ir="3" aria-current="false"><span class="etapa-barra"><i></i></span><span class="etapa-nome">3 · O dia</span></button>
+    <button class="etapa" type="button" data-ir="4" aria-current="false"><span class="etapa-barra"><i></i></span><span class="etapa-nome">4 · Balanço</span></button>
+  </nav>
+
+  <main class="palco">
+    <div class="coluna">
+
+      <!-- ============ PASSO 1 ============ -->
+      <section class="passo" id="passo-1" hidden>
+        <div class="abertura">
+          <p class="sobrescrito">Aferição</p>
+          <h1>Duas medidas e a gente já sabe o seu gasto.</h1>
+          <p class="lide">Arraste as réguas ou descreva você mesmo em uma frase. O cálculo acontece enquanto você mexe — nada sai deste aparelho.</p>
+        </div>
+
+        <div class="ditado" id="ditado">
+          <div class="ditado-topo">
+            <span><b>Descreva-se</b> — a gente preenche</span>
+            <span>interpretação local</span>
+          </div>
+          <div class="ditado-linha">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"></path>
+              <path d="M18.5 15.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9z"></path>
+            </svg>
+            <input id="frase" type="text" autocomplete="off" spellcheck="false" placeholder="mulher de 42 anos, 68 kg, 1,62 m, caminha 3x por semana">
+            <button class="btn-ler" id="btn-ler" type="button">Preencher</button>
+          </div>
+          <div class="exemplos" id="exemplos"></div>
+          <div class="lidos" id="lidos" aria-live="polite"></div>
+        </div>
+
+        <div class="bloco inst" data-campo="sexo">
+          <div class="bloco-cab"><span class="rot rot-obr">Sexo biológico</span></div>
+          <div class="duo" id="duo" style="--x:0%">
+            <button type="button" data-sexo="M" aria-pressed="true">Masculino</button>
+            <button type="button" data-sexo="F" aria-pressed="false">Feminino</button>
+          </div>
+        </div>
+
+        <div class="bloco inst" data-campo="idade">
+          <div class="bloco-cab"><span class="rot rot-obr">Idade</span><span class="leitura"><output id="out-idade">35</output><span class="un">anos</span></span></div>
+          <div class="trilho" data-trilho="idade"><div class="ticks"></div><div class="preenchido"></div><div class="agulha"></div><input type="range" id="r-idade" min="12" max="90" step="1" value="35" aria-label="Idade em anos"></div>
+          <div class="escala"><span>12</span><span>90</span></div>
+        </div>
+
+        <div class="bloco inst" data-campo="peso">
+          <div class="bloco-cab"><span class="rot rot-obr">Peso</span><span class="leitura"><output id="out-peso">82,0</output><span class="un">kg</span></span></div>
+          <div class="trilho" data-trilho="peso"><div class="ticks"></div><div class="preenchido"></div><div class="agulha"></div><input type="range" id="r-peso" min="35" max="180" step="0.5" value="82" aria-label="Peso em quilos"></div>
+          <div class="escala"><span>35</span><span>180</span></div>
+        </div>
+
+        <div class="bloco inst" data-campo="altura">
+          <div class="bloco-cab"><span class="rot rot-obr">Altura</span><span class="leitura"><output id="out-altura">1,78</output><span class="un">m</span></span></div>
+          <div class="trilho" data-trilho="altura"><div class="ticks"></div><div class="preenchido"></div><div class="agulha"></div><input type="range" id="r-altura" min="130" max="215" step="1" value="178" aria-label="Altura em centímetros"></div>
+          <div class="escala"><span>1,30</span><span>2,15</span></div>
+        </div>
+
+        <div class="bloco inst" data-campo="atividade">
+          <div class="bloco-cab"><span class="rot rot-obr">Rotina de movimento</span><span class="rot" id="ativ-desc">Exercício moderado 3 a 5 vezes por semana</span></div>
+          <div class="atividades" id="atividades"></div>
+        </div>
+
+        <div class="bloco inst">
+          <button class="op-cab" id="op-cab" type="button" aria-expanded="true" aria-controls="op-corpo">
+            <span class="op-titulo"><span class="rot">Fita métrica · opcional</span><span>Cintura e quadril liberam o risco cardiovascular</span></span>
+            <svg class="op-seta" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="op-corpo" id="op-corpo" data-aberto="1"><div><div class="op-grid">
+            <div data-campo="cintura">
+              <div class="bloco-cab"><span class="rot">Cintura</span><span class="leitura"><output id="out-cintura">96</output><span class="un">cm</span></span></div>
+              <div class="trilho" data-trilho="cintura"><div class="ticks"></div><div class="preenchido"></div><div class="agulha"></div><input type="range" id="r-cintura" min="50" max="160" step="1" value="96" aria-label="Cintura em centímetros"></div>
+              <div class="escala"><span>50</span><span>160</span></div>
+            </div>
+            <div data-campo="quadril">
+              <div class="bloco-cab"><span class="rot">Quadril</span><span class="leitura"><output id="out-quadril">102</output><span class="un">cm</span></span></div>
+              <div class="trilho" data-trilho="quadril"><div class="ticks"></div><div class="preenchido"></div><div class="agulha"></div><input type="range" id="r-quadril" min="60" max="170" step="1" value="102" aria-label="Quadril em centímetros"></div>
+              <div class="escala"><span>60</span><span>170</span></div>
+            </div>
+          </div></div></div>
+        </div>
+      </section>
+
+      <!-- ============ PASSO 2 ============ -->
+      <section class="passo" id="passo-2" hidden>
+        <div class="abertura">
+          <p class="sobrescrito">Leitura</p>
+          <h1>O seu corpo em <em>três números</em>.</h1>
+          <p class="lide" id="p2-perfil">Homem, 35 anos, 82,0 kg, 1,78 m, atividade moderada.</p>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-cab">
+            <span class="rot">Gasto energético · três equações</span>
+            <span class="rot">toque para trocar a referência</span>
+          </div>
+          <div class="eqs" id="eqs"></div>
+          <div class="composicao">
+            <div class="comp-barra"><i class="comp-tmb" id="comp-tmb" style="width:64%"></i><i class="comp-ativ" id="comp-ativ" style="width:36%"></i></div>
+            <div class="comp-legenda">
+              <span><i class="ponto" style="background:var(--accent)"></i>Repouso (TMB) <b id="leg-tmb">1.763 kcal</b></span>
+              <span><i class="ponto" style="background:var(--accent-soft)"></i>Movimento <b id="leg-ativ">969 kcal</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-cab"><span class="rot">Índice de massa corporal</span><span class="rot" id="imc-ref">Classificação OMS · adultos</span></div>
+          <div class="imc-topo">
+            <span class="numero" id="imc-valor">25,9</span>
+            <span class="chip" id="imc-chip" data-estado="alerta">Sobrepeso</span>
+          </div>
+          <div class="faixa-imc">
+            <div class="faixa-barra" id="faixa-barra"></div>
+            <div class="faixa-marcas" id="faixa-marcas"></div>
+            <div class="faixa-agulha" id="faixa-agulha" style="--x:44%"><i></i></div>
+          </div>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-cab"><span class="rot">Risco cardiovascular</span><span class="rot">cortes da OMS</span></div>
+          <div class="fitas">
+            <div>
+              <div class="fita-cab">
+                <span>Circunferência da cintura</span>
+                <span style="display:flex;align-items:center;gap:10px"><span class="fita-val" id="cin-val">96 cm</span><span class="chip" id="cin-chip" data-estado="alerta">Aumentado</span></span>
+              </div>
+              <div class="fita-trilho" id="fita-cintura">
+                <div class="fita-zona" data-z="ok"></div><div class="fita-zona" data-z="alerta"></div><div class="fita-zona" data-z="risco"></div>
+                <div class="fita-marcador"></div>
+              </div>
+              <div class="fita-cortes" id="cortes-cintura"><span>60 cm</span><span>corte 94</span><span>corte 102</span><span>130 cm</span></div>
+            </div>
+            <div>
+              <div class="fita-cab">
+                <span>Relação cintura / quadril</span>
+                <span style="display:flex;align-items:center;gap:10px"><span class="fita-val" id="rcq-val">0,94</span><span class="chip" id="rcq-chip" data-estado="alerta">Aumentado</span></span>
+              </div>
+              <div class="fita-trilho" id="fita-rcq">
+                <div class="fita-zona" data-z="ok"></div><div class="fita-zona" data-z="risco"></div>
+                <div class="fita-marcador"></div>
+              </div>
+              <div class="fita-cortes" id="cortes-rcq"><span>0,65</span><span>corte 0,90</span><span>1,20</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PASSO 3 ============ -->
+      <section class="passo" id="passo-3" hidden>
+        <div class="abertura">
+          <p class="sobrescrito">O dia</p>
+          <h1>Monte um dia comum seu.</h1>
+          <p class="lide">Seis refeições, da mais leve à mais pesada. Toque na que mais se parece com o que você come — dá para pular as que você não faz.</p>
+        </div>
+        <div class="trilha" id="trilha"></div>
+      </section>
+
+      <!-- ============ PASSO 4 ============ -->
+      <section class="passo" id="passo-4" hidden>
+        <div class="abertura">
+          <p class="sobrescrito">Balanço</p>
+          <p class="veredito" id="veredito">Você ingere cerca de <b>2.090 kcal</b> por dia e gasta <span class="gasto">2.732 kcal</span>.</p>
+          <div><span class="chip" id="balanco-chip" data-estado="info">Déficit de 642 kcal/dia</span></div>
+          <p class="lide" id="balanco-frase">Come menos do que gasta: tendência de perder peso ao longo das semanas.</p>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-cab">
+            <span class="rot">Se esse dia se repetir</span>
+            <div class="horizontes" id="horizontes">
+              <button class="hz" type="button" data-sem="4">4 sem</button>
+              <button class="hz" type="button" data-sem="12" aria-pressed="true">12 sem</button>
+              <button class="hz" type="button" data-sem="24">24 sem</button>
+              <button class="hz" type="button" data-sem="52">1 ano</button>
+            </div>
+          </div>
+          <svg class="grafico" id="grafico" viewBox="0 0 640 260" role="img" aria-labelledby="g-titulo"><title id="g-titulo">Projeção de peso</title></svg>
+          <div class="legenda-g">
+            <span><i class="tracinho"></i> Modelo dinâmico</span>
+            <span><i class="tracinho" data-tipo="linear"></i> Regra simples (7.700 kcal = 1 kg)</span>
+          </div>
+          <div class="cartoes">
+            <div class="cartao"><span class="rot">Peso projetado</span><span class="numero" id="c-peso">75,6 kg</span></div>
+            <div class="cartao"><span class="rot">Diferença</span><span class="numero" id="c-dif">−6,4 kg</span></div>
+            <div class="cartao"><span class="rot">Ritmo médio</span><span class="numero" id="c-ritmo">0,53 kg/sem</span></div>
+          </div>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-cab"><span class="rot">Seu dia alimentar</span><span class="rot" id="dia-total">2.090 kcal</span></div>
+          <div class="soma-lista" id="resumo-dia"></div>
+        </div>
+
+        <div class="folha-envolve" id="relatorio" hidden>
+          <div class="folha" id="folha"></div>
+          <p class="nota-rodape">Prévia da folha de impressão — sempre em fundo claro, independente do tema.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ MONITOR ============ -->
+    <aside class="monitor" aria-label="Leitura ao vivo">
+      <div class="mon-secao">
+        <div class="mon-cab">
+          <span class="rot pulso"><i aria-hidden="true"></i> Leitura ao vivo</span>
+          <span class="rot" id="mon-perfil">Homem · 35 anos</span>
+        </div>
+        <div class="vet"><span id="vet">2732</span><span class="un">kcal / dia</span></div>
+        <div class="vet-nota" id="vet-nota">TMB 1.763 kcal × fator 1,550 · Mifflin</div>
+      </div>
+
+      <div class="mon-secao" id="mon-corpo">
+        <div class="mon-cab"><span class="rot">Corpo</span><span class="chip" id="mon-imc-chip" data-estado="alerta">Sobrepeso</span></div>
+        <div class="medidas-lista">
+          <div class="medida"><span class="medida-rot"><b>IMC</b><span id="mon-imc-ref">OMS · adultos</span></span><span class="medida-val" id="mon-imc">25,9</span></div>
+          <div class="medida"><span class="medida-rot"><b>Cintura</b><span id="mon-cin-ref">OMS · ≥ 94 · ≥ 102 cm</span></span><span class="medida-val" id="mon-cin">96 cm</span></div>
+          <div class="medida"><span class="medida-rot"><b>Cintura / quadril</b><span id="mon-rcq-ref">OMS · homem > 0,90</span></span><span class="medida-val" id="mon-rcq">0,94</span></div>
+        </div>
+      </div>
+
+      <div class="mon-secao" id="mon-dia" hidden>
+        <div class="mon-cab"><span class="rot">Acumulado do dia</span><span class="rot" id="mon-dia-n">0 de 6</span></div>
+        <div class="soma-topo">
+          <span class="soma-val" id="soma-val">0</span>
+          <span class="soma-alvo">de <b id="soma-alvo">2.732</b> kcal</span>
+        </div>
+        <div class="soma-barra"><i id="soma-barra"></i><u></u></div>
+        <div class="soma-lista" id="soma-lista"></div>
+      </div>
+
+      <div class="mon-secao mon-rodape">
+        <button class="btn-avancar" type="button" id="btn-avancar">
+          <span id="btn-avancar-txt">Ver a leitura</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </button>
+        <button class="btn-voltar" type="button" id="btn-voltar" hidden>Voltar</button>
+        <p class="nota-rodape">Mock com dados de exemplo · cálculo roda no navegador<br>Ferramenta educativa. Não substitui avaliação com nutricionista.</p>
+      </div>
+    </aside>
+  </main>
+
+  <p class="creditos">
+    <span>Mifflin-St Jeor · Harris-Benedict 1984 · FAO/OMS 2004</span>
+    <span>IMC: OMS (18–59) e Lipschitz (60+)</span>
+    <span>Projeção: curva ilustrativa do mock</span>
+  </p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var REFEICOES = [{"id": "cafe", "nome": "Café da manhã", "horario": "7h", "opcoes": [{"nome": "Frutas com iogurte e aveia", "desc": "1 banana, 1 pote de iogurte natural e 2 col. sopa de aveia em flocos", "kcal": 250, "foto": "https://images.unsplash.com/photo-1635153513641-8f8d449b369b?w=640&h=480&fit=crop&q=70"}, {"nome": "Pão francês com queijo e café", "desc": "1 pão francês, 2 fatias de queijo minas e 1 xícara de café com leite", "kcal": 400, "foto": "https://images.unsplash.com/photo-1530868156061-e5e8a5450c51?w=640&h=480&fit=crop&q=70"}, {"nome": "Pão de queijo e suco de laranja", "desc": "3 unidades de pão de queijo e 1 copo de suco de laranja natural", "kcal": 480, "foto": "https://images.unsplash.com/photo-1559141680-d0bd7bc5af84?w=640&h=480&fit=crop&q=70"}, {"nome": "Misto quente, bolo e achocolatado", "desc": "1 misto quente, 1 fatia de bolo de fubá e 1 copo de achocolatado", "kcal": 650, "foto": "https://images.unsplash.com/photo-1768966741319-0ab742d22eb8?w=640&h=480&fit=crop&q=70"}]}, {"id": "lanche_manha", "nome": "Lanche da manhã", "horario": "10h", "opcoes": [{"nome": "Maçã com castanhas", "desc": "1 maçã média e 3 unidades de castanha-do-pará", "kcal": 100, "foto": "https://images.unsplash.com/photo-1630563451961-ac2ff27616ab?w=640&h=480&fit=crop&q=70"}, {"nome": "Barra de cereal e suco de uva", "desc": "1 barra de cereal e 1 copo de suco de uva integral", "kcal": 180, "foto": "https://images.unsplash.com/photo-1633360821154-1935fb5671e6?w=640&h=480&fit=crop&q=70"}, {"nome": "Biscoito recheado e chá", "desc": "4 unidades de biscoito recheado de chocolate e 1 xícara de chá", "kcal": 300, "foto": "https://images.unsplash.com/photo-1596108005029-8b6b02720dfd?w=640&h=480&fit=crop&q=70"}, {"nome": "Salgado frito e refrigerante", "desc": "1 coxinha de frango e 1 lata de refrigerante", "kcal": 500, "foto": "https://images.unsplash.com/photo-1769254870299-338bfd99aabd?w=640&h=480&fit=crop&q=70"}]}, {"id": "almoco", "nome": "Almoço", "horario": "12h30", "opcoes": [{"nome": "Salada com frango grelhado", "desc": "1 prato de salada verde, 100g de frango grelhado e 4 col. sopa de arroz integral", "kcal": 500, "foto": "https://images.unsplash.com/photo-1582034986517-30d163aa1da9?w=640&h=480&fit=crop&q=70"}, {"nome": "Arroz, feijão e carne com salada", "desc": "4 col. sopa de arroz, 2 col. sopa de feijão, 100g de carne bovina grelhada e salada", "kcal": 700, "foto": "https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?w=640&h=480&fit=crop&q=70"}, {"nome": "Feijoada com arroz e couve", "desc": "1 concha de feijoada, 4 col. sopa de arroz branco e couve refogada", "kcal": 900, "foto": "https://images.unsplash.com/photo-1627906327792-4ede6149189f?w=640&h=480&fit=crop&q=70"}, {"nome": "Pizza e refrigerante", "desc": "4 fatias de pizza de calabresa e 1 lata de refrigerante", "kcal": 1300, "foto": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=640&h=480&fit=crop&q=70"}]}, {"id": "lanche_tarde", "nome": "Lanche da tarde", "horario": "16h", "opcoes": [{"nome": "Iogurte com granola", "desc": "1 pote de iogurte natural e 2 col. sopa de granola", "kcal": 150, "foto": "https://images.unsplash.com/photo-1633104060731-32143505bacc?w=640&h=480&fit=crop&q=70"}, {"nome": "Sanduíche natural e suco", "desc": "1 sanduíche natural de peito de peru e 1 copo de suco de melancia", "kcal": 280, "foto": "https://images.unsplash.com/photo-1591224942496-0b89685d0c7c?w=640&h=480&fit=crop&q=70"}, {"nome": "Pão de queijo e café com leite", "desc": "2 unidades de pão de queijo e 1 xícara de café com leite", "kcal": 320, "foto": "https://images.unsplash.com/photo-1745031601360-b189f522ea90?w=640&h=480&fit=crop&q=70"}, {"nome": "Açaí com granola e leite condensado", "desc": "1 tigela de açaí (500ml) com granola e leite condensado", "kcal": 550, "foto": "https://images.unsplash.com/photo-1627308594190-a057cd4bfac8?w=640&h=480&fit=crop&q=70"}]}, {"id": "jantar", "nome": "Jantar", "horario": "19h30", "opcoes": [{"nome": "Sopa de legumes com frango", "desc": "1 prato de sopa de legumes com pedaços de frango desfiado", "kcal": 300, "foto": "https://images.unsplash.com/photo-1559561723-c3f4195835db?w=640&h=480&fit=crop&q=70"}, {"nome": "Omelete com salada e pão", "desc": "omelete de 2 ovos, salada verde e 1 fatia de pão integral", "kcal": 450, "foto": "https://images.unsplash.com/photo-1646753331463-3bc9565f9541?w=640&h=480&fit=crop&q=70"}, {"nome": "Macarrão à bolonhesa", "desc": "1 prato de macarrão ao molho bolonhesa com queijo ralado", "kcal": 750, "foto": "https://images.unsplash.com/photo-1571175534150-72cd2b5a6039?w=640&h=480&fit=crop&q=70"}, {"nome": "Hambúrguer com batata frita", "desc": "1 hambúrguer artesanal com queijo e 1 porção de batata frita", "kcal": 1100, "foto": "https://images.unsplash.com/photo-1627781962452-6b468257844b?w=640&h=480&fit=crop&q=70"}]}, {"id": "ceia", "nome": "Ceia", "horario": "22h", "opcoes": [{"nome": "Chá com bolacha", "desc": "1 xícara de chá e 3 bolachas de água e sal", "kcal": 90, "foto": "https://images.unsplash.com/photo-1737092684423-03ee785a6ff6?w=640&h=480&fit=crop&q=70"}, {"nome": "Iogurte com mel", "desc": "1 pote de iogurte natural com 1 col. sopa de mel", "kcal": 180, "foto": "https://images.unsplash.com/photo-1633893215265-4763142f9b57?w=640&h=480&fit=crop&q=70"}, {"nome": "Vitamina de banana", "desc": "1 copo de vitamina de banana com leite integral", "kcal": 280, "foto": "https://images.unsplash.com/photo-1542444592-e6880e286bb9?w=640&h=480&fit=crop&q=70"}, {"nome": "Sanduíche misto e refrigerante", "desc": "1 sanduíche de presunto e queijo e 1 copo de refrigerante", "kcal": 500, "foto": "https://images.unsplash.com/photo-1714959503216-ebd6562e3a4c?w=640&h=480&fit=crop&q=70"}]}];
+
+  var reduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var NIVEIS = [
+    { id: "sedentario", nome: "Sedentário", fator: 1.2, barras: 1, desc: "Pouco ou nenhum exercício, trabalho sentado" },
+    { id: "leve", nome: "Leve", fator: 1.375, barras: 2, desc: "Exercício leve 1 a 3 vezes por semana" },
+    { id: "moderado", nome: "Moderado", fator: 1.55, barras: 3, desc: "Exercício moderado 3 a 5 vezes por semana" },
+    { id: "intenso", nome: "Intenso", fator: 1.725, barras: 4, desc: "Exercício pesado 6 a 7 vezes por semana" },
+    { id: "muito", nome: "Muito intenso", fator: 1.9, barras: 5, desc: "Treino pesado 2x ao dia ou trabalho físico" }
+  ];
+
+  var EQS = [
+    { id: "mifflin", nome: "Mifflin-St Jeor", nota: "peso, altura, idade e sexo" },
+    { id: "harris", nome: "Harris-Benedict", nota: "revisão de 1984" },
+    { id: "fao", nome: "FAO/OMS", nota: "2004 · por faixa etária" }
+  ];
+
+  var estado = {
+    passo: 2,
+    sexo: "M", idade: 35, peso: 82, altura: 178,
+    nivel: "moderado", cintura: 96, quadril: 102, equacao: "mifflin",
+    escolhas: { cafe: 2, lanche_manha: 1, almoco: 1 },
+    ativa: "lanche_tarde",
+    semanas: 12
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (v, c) { return v.toLocaleString("pt-BR", { minimumFractionDigits: c, maximumFractionDigits: c }); };
+
+  /* ---------------- domínio ---------------- */
+  function nivelAtual() {
+    for (var i = 0; i < NIVEIS.length; i++) if (NIVEIS[i].id === estado.nivel) return NIVEIS[i];
+    return NIVEIS[2];
+  }
+
+  function tmbDe(eq) {
+    var p = estado.peso, a = estado.altura, i = estado.idade, h = estado.sexo === "M";
+    if (eq === "harris") {
+      return h ? 88.362 + 13.397 * p + 4.799 * a - 5.677 * i : 447.593 + 9.247 * p + 3.098 * a - 4.330 * i;
+    }
+    if (eq === "fao") {
+      if (h) { if (i < 30) return 15.057 * p + 692.2; if (i < 60) return 11.472 * p + 873.1; return 11.711 * p + 587.7; }
+      if (i < 30) return 14.818 * p + 486.6;
+      if (i < 60) return 8.126 * p + 845.6;
+      return 9.082 * p + 658.5;
+    }
+    return h ? 10 * p + 6.25 * a - 5 * i + 5 : 10 * p + 6.25 * a - 5 * i - 161;
+  }
+
+  function tmb() { return tmbDe(estado.equacao); }
+  function vet() { return Math.round(tmb() * nivelAtual().fator); }
+  function imc() { return estado.peso / Math.pow(estado.altura / 100, 2); }
+
+  function faixasImc() {
+    if (estado.idade < 18) return [{ de: 15, ate: 40, cor: "var(--line-forte)", nome: "" }];
+    if (estado.idade >= 60) {
+      return [
+        { de: 15, ate: 22, cor: "var(--info)", nome: "baixo" },
+        { de: 22, ate: 27, cor: "var(--accent)", nome: "eutrofia" },
+        { de: 27, ate: 40, cor: "var(--warn)", nome: "sobrepeso" }
+      ];
+    }
+    return [
+      { de: 15, ate: 18.5, cor: "var(--info)", nome: "baixo" },
+      { de: 18.5, ate: 25, cor: "var(--accent)", nome: "adequado" },
+      { de: 25, ate: 30, cor: "var(--warn)", nome: "sobrepeso" },
+      { de: 30, ate: 40, cor: "var(--danger)", nome: "obesidade" }
+    ];
+  }
+
+  function classificarImc(v) {
+    if (estado.idade < 18) return { texto: "Sem classificação", estado: "neutro", ref: "Menor de 18 · use curvas de crescimento" };
+    if (estado.idade >= 60) {
+      if (v < 22) return { texto: "Baixo peso", estado: "alerta", ref: "Lipschitz (1994) · 60 anos ou mais" };
+      if (v <= 27) return { texto: "Eutrofia", estado: "bom", ref: "Lipschitz (1994) · 60 anos ou mais" };
+      return { texto: "Sobrepeso", estado: "alerta", ref: "Lipschitz (1994) · 60 anos ou mais" };
+    }
+    if (v < 18.5) return { texto: "Baixo peso", estado: "alerta", ref: "Classificação OMS · adultos" };
+    if (v < 25) return { texto: "Peso adequado", estado: "bom", ref: "Classificação OMS · adultos" };
+    if (v < 30) return { texto: "Sobrepeso", estado: "alerta", ref: "Classificação OMS · adultos" };
+    if (v < 35) return { texto: "Obesidade grau I", estado: "risco", ref: "Classificação OMS · adultos" };
+    if (v < 40) return { texto: "Obesidade grau II", estado: "risco", ref: "Classificação OMS · adultos" };
+    return { texto: "Obesidade grau III", estado: "risco", ref: "Classificação OMS · adultos" };
+  }
+
+  function cortesCintura() { return estado.sexo === "M" ? [94, 102] : [80, 88]; }
+  function corteRcq() { return estado.sexo === "M" ? 0.90 : 0.85; }
+
+  function classificarCintura(cm) {
+    var c = cortesCintura();
+    if (cm >= c[1]) return { texto: "Muito aumentado", estado: "risco" };
+    if (cm >= c[0]) return { texto: "Aumentado", estado: "alerta" };
+    return { texto: "Adequado", estado: "bom" };
+  }
+  function classificarRcq(r) {
+    return r > corteRcq() ? { texto: "Aumentado", estado: "alerta" } : { texto: "Adequado", estado: "bom" };
+  }
+
+  function ingerido() {
+    var t = 0;
+    Object.keys(estado.escolhas).forEach(function (k) {
+      var i = estado.escolhas[k];
+      if (i === null || i === undefined || i < 0) return;
+      var r = REFEICOES.filter(function (x) { return x.id === k; })[0];
+      if (r && r.opcoes[i]) t += r.opcoes[i].kcal;
+    });
+    return t;
+  }
+  function respondidas() { return Object.keys(estado.escolhas).length; }
+  function diaCompleto() { return respondidas() >= REFEICOES.length; }
+
+  /* projeção: linear (7700) e curva com desaceleração (aproximação do mock) */
+  function projecao(dias) {
+    var p0 = estado.peso, gasto = vet();
+    var ing = Math.max(600, ingerido());
+    var def = gasto - ing;
+    var k = gasto / p0;
+    var pEq = ing / k;
+    var tau = 210;
+    var lin = [], din = [];
+    for (var d = 0; d <= dias; d += Math.max(1, Math.round(dias / 60))) {
+      lin.push([d, p0 - (def * d) / 7700]);
+      din.push([d, pEq + (p0 - pEq) * Math.exp(-d / tau)]);
+    }
+    if (lin[lin.length - 1][0] !== dias) {
+      lin.push([dias, p0 - (def * dias) / 7700]);
+      din.push([dias, pEq + (p0 - pEq) * Math.exp(-dias / tau)]);
+    }
+    return { lin: lin, din: din };
+  }
+
+  /* ---------------- odômetro ---------------- */
+  function contar(el, para, casas, sufixo) {
+    var de = parseFloat(String(el.dataset.v || "0"));
+    el.dataset.v = String(para);
+    if (reduzido || Math.abs(para - de) < 0.005) { el.textContent = num(para, casas) + (sufixo || ""); return; }
+    var t0 = performance.now(), dur = 420;
+    if (el._raf) cancelAnimationFrame(el._raf);
+    function passo(t) {
+      var k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = num(de + (para - de) * e, casas) + (sufixo || "");
+      if (k < 1) el._raf = requestAnimationFrame(passo);
+    }
+    el._raf = requestAnimationFrame(passo);
+  }
+
+  /* ---------------- passo 1 ---------------- */
+  var REGUAS = {
+    idade: { chave: "idade", casas: 0 },
+    peso: { chave: "peso", casas: 1 },
+    altura: { chave: "altura", casas: 2, mostrar: function (v) { return v / 100; } },
+    cintura: { chave: "cintura", casas: 0 },
+    quadril: { chave: "quadril", casas: 0 }
+  };
+
+  Object.keys(REGUAS).forEach(function (k) {
+    var r = REGUAS[k];
+    r.input = $("r-" + k);
+    r.out = $("out-" + k);
+    r.trilho = document.querySelector('[data-trilho="' + k + '"]');
+    r.input.addEventListener("input", function () {
+      r.trilho.dataset.suave = "0";
+      estado[r.chave] = parseFloat(r.input.value);
+      pintarRegua(k);
+      render();
+    });
+  });
+
+  function pintarRegua(k) {
+    var r = REGUAS[k], el = r.input;
+    var min = parseFloat(el.min), max = parseFloat(el.max);
+    r.trilho.style.setProperty("--pct", (((parseFloat(el.value) - min) / (max - min)) * 100).toFixed(2) + "%");
+    contar(r.out, r.mostrar ? r.mostrar(parseFloat(el.value)) : parseFloat(el.value), r.casas);
+  }
+
+  function definirRegua(k, valor, suave) {
+    var r = REGUAS[k];
+    r.input.value = String(valor);
+    estado[r.chave] = parseFloat(r.input.value);
+    r.trilho.dataset.suave = suave ? "1" : "0";
+    pintarRegua(k);
+  }
+
+  var duo = $("duo");
+  duo.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-sexo]");
+    if (b) { definirSexo(b.dataset.sexo); render(); }
+  });
+  function definirSexo(s) {
+    estado.sexo = s;
+    duo.style.setProperty("--x", s === "M" ? "0%" : "100%");
+    Array.prototype.forEach.call(duo.querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", b.dataset.sexo === s ? "true" : "false");
+    });
+  }
+
+  var caixaAtiv = $("atividades");
+  NIVEIS.forEach(function (n) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "ativ"; b.dataset.nivel = n.id; b.title = n.desc;
+    b.setAttribute("aria-pressed", n.id === estado.nivel ? "true" : "false");
+    var barras = '<span class="ativ-barras" aria-hidden="true">';
+    for (var i = 1; i <= 5; i++) barras += '<i class="' + (i <= n.barras ? "on" : "") + '" style="height:' + (4 + i * 3.2) + 'px"></i>';
+    barras += "</span>";
+    b.innerHTML = barras + '<span class="ativ-nome">' + n.nome + '</span><span class="ativ-fator">×' + num(n.fator, 3) + "</span>";
+    caixaAtiv.appendChild(b);
+  });
+  caixaAtiv.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-nivel]");
+    if (b) { definirNivel(b.dataset.nivel); render(); }
+  });
+  function definirNivel(id) {
+    estado.nivel = id;
+    Array.prototype.forEach.call(caixaAtiv.querySelectorAll(".ativ"), function (b) {
+      b.setAttribute("aria-pressed", b.dataset.nivel === id ? "true" : "false");
+    });
+    $("ativ-desc").textContent = nivelAtual().desc;
+  }
+
+  $("op-cab").addEventListener("click", function () {
+    var aberto = this.getAttribute("aria-expanded") === "true";
+    this.setAttribute("aria-expanded", aberto ? "false" : "true");
+    $("op-corpo").dataset.aberto = aberto ? "0" : "1";
+  });
+
+  var FRASES = [
+    "homem, 35 anos, 82 kg, 1,78 m, treino 3x por semana",
+    "mulher de 63 anos, 71 kg, 1,58 m, sedentária, cintura 89",
+    "tenho 24 anos, 58 kg e 1,65 m, sou mulher e faço academia todo dia"
+  ];
+  var caixaEx = $("exemplos");
+  FRASES.forEach(function (f) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "exemplo"; b.dataset.frase = f;
+    b.textContent = f.length > 44 ? f.slice(0, 42) + "…" : f;
+    caixaEx.appendChild(b);
+  });
+  caixaEx.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-frase]");
+    if (b) { $("frase").value = b.dataset.frase; interpretar(); }
+  });
+  $("btn-ler").addEventListener("click", interpretar);
+  $("frase").addEventListener("keydown", function (ev) { if (ev.key === "Enter") interpretar(); });
+
+  function extrair(texto) {
+    var t = " " + texto.toLowerCase().replace(/\s+/g, " ") + " ";
+    var a = [], m;
+    if (/\b(mulher|feminin|garota|menina|senhora)\b/.test(t)) a.push({ campo: "sexo", valor: "F", rot: "sexo", texto: "feminino" });
+    else if (/\b(homem|masculin|rapaz|menino|senhor)\b/.test(t)) a.push({ campo: "sexo", valor: "M", rot: "sexo", texto: "masculino" });
+    m = t.match(/(\d{1,3})\s*anos/) || t.match(/idade\s*:?\s*(\d{1,3})/);
+    if (m) a.push({ campo: "idade", valor: +m[1], rot: "idade", texto: m[1] + " anos" });
+    m = t.match(/(\d{2,3}(?:[.,]\d)?)\s*(?:kg|quilos?|kilos?)/);
+    if (m) a.push({ campo: "peso", valor: parseFloat(m[1].replace(",", ".")), rot: "peso", texto: m[1].replace(".", ",") + " kg" });
+    m = t.match(/(\d)[.,](\d{2})\s*m\b/) || t.match(/\b(\d)[.,](\d{2})\b/);
+    if (m) a.push({ campo: "altura", valor: +m[1] * 100 + +m[2], rot: "altura", texto: m[1] + "," + m[2] + " m" });
+    else { m = t.match(/(\d{3})\s*cm/); if (m) a.push({ campo: "altura", valor: +m[1], rot: "altura", texto: (+m[1] / 100).toFixed(2).replace(".", ",") + " m" }); }
+    m = t.match(/cintura\s*(?:de\s*)?(\d{2,3})/);
+    if (m) a.push({ campo: "cintura", valor: +m[1], rot: "cintura", texto: m[1] + " cm" });
+    m = t.match(/quadril\s*(?:de\s*)?(\d{2,3})/);
+    if (m) a.push({ campo: "quadril", valor: +m[1], rot: "quadril", texto: m[1] + " cm" });
+    var nv = null;
+    if (/muito intenso|2x ao dia|atleta|trabalho físico/.test(t)) nv = "muito";
+    else if (/intens|pesad|6x|7x|todo dia|todos os dias|6 a 7/.test(t)) nv = "intenso";
+    else if (/moderad|3x|4x|5x|3 a 5|academia/.test(t)) nv = "moderado";
+    else if (/leve|caminh|1x|2x|1 a 3/.test(t)) nv = "leve";
+    else if (/sedentári|parad|escritório|escritorio/.test(t)) nv = "sedentario";
+    if (nv) {
+      var n = NIVEIS.filter(function (x) { return x.id === nv; })[0];
+      a.push({ campo: "nivel", valor: nv, rot: "rotina", texto: n.nome.toLowerCase() });
+    }
+    return a;
+  }
+
+  function interpretar() {
+    var texto = $("frase").value.trim(), lidos = $("lidos");
+    lidos.innerHTML = "";
+    if (!texto) { $("frase").focus(); return; }
+    var achados = extrair(texto);
+    $("ditado").dataset.lendo = "1";
+    $("btn-ler").dataset.lendo = "1";
+    window.setTimeout(function () {
+      $("ditado").dataset.lendo = "0";
+      $("btn-ler").dataset.lendo = "0";
+      if (!achados.length) {
+        var v = document.createElement("span");
+        v.className = "lido";
+        v.textContent = "não achei medidas nessa frase — tente “32 anos, 70 kg, 1,70 m”";
+        lidos.appendChild(v);
+        return;
+      }
+      achados.forEach(function (a, i) {
+        window.setTimeout(function () {
+          aplicar(a);
+          var chip = document.createElement("span");
+          chip.className = "lido";
+          chip.innerHTML = a.rot + " · <b>" + a.texto + "</b>";
+          lidos.appendChild(chip);
+          render();
+        }, reduzido ? 0 : i * 130);
+      });
+    }, reduzido ? 0 : 460);
+  }
+
+  function aplicar(a) {
+    var alvo;
+    if (a.campo === "sexo") { definirSexo(a.valor); alvo = document.querySelector('[data-campo="sexo"]'); }
+    else if (a.campo === "nivel") { definirNivel(a.valor); alvo = document.querySelector('[data-campo="atividade"]'); }
+    else {
+      var r = REGUAS[a.campo];
+      var v = Math.min(parseFloat(r.input.max), Math.max(parseFloat(r.input.min), a.valor));
+      definirRegua(a.campo, v, true);
+      alvo = document.querySelector('[data-campo="' + a.campo + '"]');
+      if (alvo && !alvo.classList.contains("bloco")) alvo = alvo.closest(".bloco") || alvo;
+    }
+    if (alvo) {
+      alvo.dataset.acende = "1";
+      window.setTimeout(function () { alvo.dataset.acende = "0"; }, 900);
+    }
+  }
+
+  /* ---------------- passo 2 ---------------- */
+  var caixaEqs = $("eqs");
+  EQS.forEach(function (e) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "eq-card"; b.dataset.eq = e.id;
+    b.innerHTML = '<span class="eq-nome">' + e.nome + '</span><span class="eq-val" data-val="' + e.id + '">0</span><span class="eq-nota">' + e.nota + "</span>";
+    caixaEqs.appendChild(b);
+  });
+  caixaEqs.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-eq]");
+    if (b) { estado.equacao = b.dataset.eq; render(); }
+  });
+
+  function renderPasso2() {
+    $("p2-perfil").textContent = (estado.sexo === "M" ? "Homem" : "Mulher") + ", " + estado.idade + " anos, " +
+      num(estado.peso, 1) + " kg, " + num(estado.altura / 100, 2) + " m, atividade " + nivelAtual().nome.toLowerCase() + ".";
+
+    EQS.forEach(function (e) {
+      var card = caixaEqs.querySelector('[data-eq="' + e.id + '"]');
+      card.setAttribute("aria-pressed", e.id === estado.equacao ? "true" : "false");
+      contar(card.querySelector(".eq-val"), Math.round(tmbDe(e.id) * nivelAtual().fator), 0);
+    });
+
+    var t = tmb(), v = vet(), pTmb = (t / v) * 100;
+    $("comp-tmb").style.width = pTmb.toFixed(1) + "%";
+    $("comp-ativ").style.width = (100 - pTmb).toFixed(1) + "%";
+    $("leg-tmb").textContent = num(Math.round(t), 0) + " kcal";
+    $("leg-ativ").textContent = num(Math.max(0, v - Math.round(t)), 0) + " kcal";
+
+    var vi = imc(), c = classificarImc(vi);
+    contar($("imc-valor"), vi, 1);
+    $("imc-chip").textContent = c.texto;
+    $("imc-chip").dataset.estado = c.estado;
+    $("imc-ref").textContent = c.ref;
+
+    var fs = faixasImc(), barra = $("faixa-barra"), marcas = $("faixa-marcas");
+    barra.innerHTML = fs.map(function (f) {
+      return '<i style="width:' + (((f.ate - f.de) / 25) * 100).toFixed(2) + "%;background:" + f.cor + '"></i>';
+    }).join("");
+    marcas.innerHTML = fs.slice(1).map(function (f) {
+      return '<span class="faixa-marca" style="left:' + (((f.de - 15) / 25) * 100).toFixed(2) + '%">' + num(f.de, f.de % 1 ? 1 : 0) + "</span>";
+    }).join("");
+    $("faixa-agulha").style.setProperty("--x", (((Math.min(40, Math.max(15, vi)) - 15) / 25) * 100).toFixed(2) + "%");
+
+    var cin = classificarCintura(estado.cintura), cortes = cortesCintura();
+    $("cin-val").textContent = estado.cintura + " cm";
+    $("cin-chip").textContent = cin.texto;
+    $("cin-chip").dataset.estado = cin.estado;
+    var fc = $("fita-cintura"), z = fc.querySelectorAll(".fita-zona");
+    var pos = function (cm) { return ((Math.min(130, Math.max(60, cm)) - 60) / 70) * 100; };
+    z[0].style.left = "0%"; z[0].style.width = pos(cortes[0]) + "%";
+    z[1].style.left = pos(cortes[0]) + "%"; z[1].style.width = (pos(cortes[1]) - pos(cortes[0])) + "%";
+    z[2].style.left = pos(cortes[1]) + "%"; z[2].style.width = (100 - pos(cortes[1])) + "%";
+    fc.querySelector(".fita-marcador").style.setProperty("--x", pos(estado.cintura) + "%");
+    $("cortes-cintura").innerHTML = "<span>60 cm</span><span>corte " + cortes[0] + "</span><span>corte " + cortes[1] + "</span><span>130 cm</span>";
+
+    var rcq = estado.cintura / estado.quadril, cr = classificarRcq(rcq), corte = corteRcq();
+    $("rcq-val").textContent = num(rcq, 2);
+    $("rcq-chip").textContent = cr.texto;
+    $("rcq-chip").dataset.estado = cr.estado;
+    var fr = $("fita-rcq"), zr = fr.querySelectorAll(".fita-zona");
+    var posR = function (r) { return ((Math.min(1.2, Math.max(0.65, r)) - 0.65) / 0.55) * 100; };
+    zr[0].style.left = "0%"; zr[0].style.width = posR(corte) + "%";
+    zr[1].style.left = posR(corte) + "%"; zr[1].style.width = (100 - posR(corte)) + "%";
+    fr.querySelector(".fita-marcador").style.setProperty("--x", posR(rcq) + "%");
+    $("cortes-rcq").innerHTML = "<span>0,65</span><span>corte " + num(corte, 2) + "</span><span>1,20</span>";
+  }
+
+  /* ---------------- passo 3 ---------------- */
+  var trilha = $("trilha");
+
+  function montarTrilha() {
+    trilha.innerHTML = REFEICOES.map(function (r) {
+      var opcoes = r.opcoes.map(function (o, i) {
+        var barras = "";
+        for (var n = 1; n <= 4; n++) barras += '<i class="' + (n <= i + 1 ? "on" : "") + '"></i>';
+        return '' +
+          '<button class="op" type="button" data-ref="' + r.id + '" data-op="' + i + '" aria-pressed="false">' +
+            '<span class="op-foto">' +
+              '<img src="' + o.foto + '" alt="" loading="lazy">' +
+              '<span class="op-nivel" aria-hidden="true">' + barras + "</span>" +
+              '<span class="op-marca" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>' +
+            "</span>" +
+            '<span class="op-txt">' +
+              '<span class="op-nome">' + o.nome + "</span>" +
+              '<span class="op-desc">' + o.desc + "</span>" +
+              '<span class="op-kcal">' + num(o.kcal, 0) + " kcal</span>" +
+            "</span>" +
+          "</button>";
+      }).join("");
+
+      return '' +
+        '<article class="ref" data-ref="' + r.id + '" data-estado="futura">' +
+          '<button class="ref-cab" type="button" data-abrir="' + r.id + '">' +
+            '<span class="ref-hora">' + r.horario + "</span>" +
+            '<span class="ref-nome">' + r.nome + "</span>" +
+            '<span class="ref-escolha" data-escolha="' + r.id + '"></span>' +
+            '<span class="ref-kcal" data-kcal="' + r.id + '"></span>' +
+          "</button>" +
+          '<div class="ref-corpo"><div><div class="ref-interior">' +
+            '<div class="opcoes">' + opcoes + "</div>" +
+            '<button class="pular" type="button" data-pular="' + r.id + '" aria-pressed="false">Não faço esta refeição</button>' +
+          "</div></div></div>" +
+        "</article>";
+    }).join("");
+  }
+
+  trilha.addEventListener("click", function (ev) {
+    var abrir = ev.target.closest("[data-abrir]");
+    if (abrir) { estado.ativa = abrir.dataset.abrir; renderPasso3(); return; }
+
+    var op = ev.target.closest("[data-op]");
+    if (op) {
+      var id = op.dataset.ref;
+      estado.escolhas[id] = parseInt(op.dataset.op, 10);
+      avancarRefeicao(id);
+      render();
+      return;
+    }
+
+    var pular = ev.target.closest("[data-pular]");
+    if (pular) {
+      estado.escolhas[pular.dataset.pular] = -1;
+      avancarRefeicao(pular.dataset.pular);
+      render();
+    }
+  });
+
+  function avancarRefeicao(id) {
+    var i = REFEICOES.map(function (r) { return r.id; }).indexOf(id);
+    var prox = REFEICOES.slice(i + 1).filter(function (r) { return !(r.id in estado.escolhas); })[0] ||
+               REFEICOES.filter(function (r) { return !(r.id in estado.escolhas); })[0];
+    estado.ativa = prox ? prox.id : null;
+  }
+
+  function renderPasso3() {
+    REFEICOES.forEach(function (r) {
+      var art = trilha.querySelector('.ref[data-ref="' + r.id + '"]');
+      var escolha = estado.escolhas[r.id];
+      var respondida = escolha !== undefined && escolha !== null;
+      art.dataset.estado = estado.ativa === r.id ? "ativa" : (respondida ? "feita" : "futura");
+
+      var cx = art.querySelector('[data-escolha="' + r.id + '"]');
+      var kc = art.querySelector('[data-kcal="' + r.id + '"]');
+      if (respondida && escolha >= 0) {
+        var o = r.opcoes[escolha];
+        cx.innerHTML = '<img src="' + o.foto + '" alt=""><span>' + o.nome + "</span>";
+        kc.textContent = num(o.kcal, 0) + " kcal";
+      } else if (respondida) {
+        cx.innerHTML = "<span>não faço</span>";
+        kc.textContent = "0 kcal";
+      } else {
+        cx.innerHTML = "";
+        kc.textContent = "";
+      }
+
+      Array.prototype.forEach.call(art.querySelectorAll("[data-op]"), function (b) {
+        b.setAttribute("aria-pressed", parseInt(b.dataset.op, 10) === escolha ? "true" : "false");
+      });
+      art.querySelector("[data-pular]").setAttribute("aria-pressed", escolha === -1 ? "true" : "false");
+    });
+  }
+
+  /* ---------------- passo 4 ---------------- */
+  $("horizontes").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-sem]");
+    if (!b) return;
+    estado.semanas = parseInt(b.dataset.sem, 10);
+    Array.prototype.forEach.call(this.querySelectorAll(".hz"), function (x) {
+      x.setAttribute("aria-pressed", x === b ? "true" : "false");
+    });
+    renderPasso4();
+  });
+
+  function renderPasso4() {
+    var ing = ingerido(), gasto = vet(), dif = ing - gasto;
+    var tol = gasto * 0.05;
+    var estadoBal = Math.abs(dif) <= tol ? "bom" : (dif < 0 ? "info" : "alerta");
+    var rotulo = Math.abs(dif) <= tol ? "Equilíbrio calórico" :
+      (dif < 0 ? "Déficit de " + num(Math.abs(dif), 0) + " kcal/dia" : "Superávit de " + num(dif, 0) + " kcal/dia");
+    var frase = Math.abs(dif) <= tol ? "Ingestão dentro de 5 % do gasto: tendência de manter o peso." :
+      (dif < 0 ? "Come menos do que gasta: tendência de perder peso ao longo das semanas."
+               : "Come mais do que gasta: tendência de ganhar peso ao longo das semanas.");
+
+    $("veredito").innerHTML = "Você ingere cerca de <b>" + num(ing, 0) + " kcal</b> por dia e gasta <span class=\"gasto\">" + num(gasto, 0) + " kcal</span>.";
+    $("balanco-chip").textContent = rotulo;
+    $("balanco-chip").dataset.estado = estadoBal;
+    $("balanco-frase").textContent = frase;
+    $("dia-total").textContent = num(ing, 0) + " kcal";
+
+    var dias = estado.semanas * 7;
+    var p = projecao(dias);
+    desenharGrafico(p, dias);
+
+    var fim = p.din[p.din.length - 1][1];
+    $("c-peso").textContent = num(fim, 1) + " kg";
+    $("c-dif").textContent = (fim - estado.peso >= 0 ? "+" : "−") + num(Math.abs(fim - estado.peso), 1) + " kg";
+    $("c-ritmo").textContent = num(Math.abs(fim - estado.peso) / estado.semanas, 2) + " kg/sem";
+
+    $("resumo-dia").innerHTML = REFEICOES.map(function (r) {
+      var e = estado.escolhas[r.id];
+      var txt = (e === undefined || e === null) ? "—" : (e === -1 ? "não faço" : r.opcoes[e].nome);
+      var kcal = (e === undefined || e === null || e === -1) ? 0 : r.opcoes[e].kcal;
+      return '<div class="soma-item"><i class="' + (kcal ? "on" : "") + '"></i><span>' + r.nome + " · " + txt + "</span><b>" + num(kcal, 0) + " kcal</b></div>";
+    }).join("");
+
+    montarFolha(ing, gasto, fim);
+  }
+
+  function desenharGrafico(p, dias) {
+    var W = 640, H = 260, ml = 46, mr = 54, mt = 16, mb = 34;
+    var todos = p.lin.concat(p.din).map(function (x) { return x[1]; });
+    var min = Math.min.apply(null, todos), max = Math.max.apply(null, todos.concat([estado.peso]));
+    var pad = Math.max(0.6, (max - min) * 0.18);
+    min -= pad; max += pad;
+    var x = function (d) { return ml + (d / dias) * (W - ml - mr); };
+    var y = function (v) { return mt + (1 - (v - min) / (max - min)) * (H - mt - mb); };
+    var caminho = function (pts) {
+      return pts.map(function (pt, i) { return (i ? "L" : "M") + x(pt[0]).toFixed(1) + " " + y(pt[1]).toFixed(1); }).join(" ");
+    };
+
+    var svg = "";
+    var linhas = 4;
+    for (var i = 0; i <= linhas; i++) {
+      var v = min + ((max - min) * i) / linhas;
+      var yy = y(v);
+      svg += '<line class="g-eixo" x1="' + ml + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mr) + '" y2="' + yy.toFixed(1) + '"></line>';
+      svg += '<text class="g-rot" x="' + (ml - 8) + '" y="' + (yy + 3.5).toFixed(1) + '" text-anchor="end">' + num(v, 1) + "</text>";
+    }
+    var passos = estado.semanas <= 4 ? 4 : (estado.semanas <= 24 ? 4 : 4);
+    for (var s = 0; s <= passos; s++) {
+      var d = (dias / passos) * s;
+      svg += '<text class="g-rot" x="' + x(d).toFixed(1) + '" y="' + (H - 12) + '" text-anchor="middle">' + Math.round(d / 7) + "</text>";
+    }
+    svg += '<text class="g-rot" x="' + (W - mr) + '" y="' + (H - 12) + '" text-anchor="end" opacity=".8">semanas</text>';
+
+    var area = caminho(p.din) + " L" + x(dias).toFixed(1) + " " + y(min).toFixed(1) + " L" + x(0).toFixed(1) + " " + y(min).toFixed(1) + " Z";
+    svg += '<path class="g-area" d="' + area + '"></path>';
+    svg += '<path class="g-linear" d="' + caminho(p.lin) + '"></path>';
+    svg += '<path class="g-din" d="' + caminho(p.din) + '"></path>';
+
+    var fim = p.din[p.din.length - 1];
+    svg += '<circle class="g-fim" cx="' + x(fim[0]).toFixed(1) + '" cy="' + y(fim[1]).toFixed(1) + '" r="4.5"></circle>';
+    svg += '<text class="g-fim-rot" x="' + (x(fim[0]) - 6).toFixed(1) + '" y="' + (y(fim[1]) - 12).toFixed(1) + '" text-anchor="end">' + num(fim[1], 1) + " kg</text>";
+
+    $("grafico").innerHTML = '<title id="g-titulo">Projeção de peso em ' + estado.semanas + " semanas</title>" + svg;
+  }
+
+  function montarFolha(ing, gasto, fim) {
+    var c = classificarImc(imc());
+    var linhas = REFEICOES.map(function (r) {
+      var e = estado.escolhas[r.id];
+      var txt = (e === undefined || e === null) ? "—" : (e === -1 ? "não faço esta refeição" : r.opcoes[e].nome);
+      var kcal = (e === undefined || e === null || e === -1) ? 0 : r.opcoes[e].kcal;
+      return '<div class="f-linha"><span>' + r.nome + " · " + txt + "</span><span>" + num(kcal, 0) + " kcal</span></div>";
+    }).join("");
+
+    $("folha").innerHTML = '' +
+      '<h2>Balanço Nutricional</h2>' +
+      '<p class="f-sub">5 de setembro de 2026 · Curso de Nutrição — feira</p>' +
+      '<p class="f-titulo">Dados</p>' +
+      '<div class="f-grade">' +
+        '<div class="f-item"><span>Sexo</span><b>' + (estado.sexo === "M" ? "Masculino" : "Feminino") + "</b></div>" +
+        '<div class="f-item"><span>Idade</span><b>' + estado.idade + " anos</b></div>" +
+        '<div class="f-item"><span>Peso</span><b>' + num(estado.peso, 1) + " kg</b></div>" +
+        '<div class="f-item"><span>Altura</span><b>' + num(estado.altura / 100, 2) + " m</b></div>" +
+        '<div class="f-item"><span>Atividade</span><b>' + nivelAtual().nome + "</b></div>" +
+        '<div class="f-item"><span>Cintura / quadril</span><b>' + estado.cintura + " / " + estado.quadril + " cm</b></div>" +
+      "</div>" +
+      '<p class="f-titulo">Resultados</p>' +
+      '<div class="f-grade">' +
+        '<div class="f-item"><span>Gasto (VET)</span><b>' + num(gasto, 0) + " kcal</b></div>" +
+        '<div class="f-item"><span>IMC</span><b>' + num(imc(), 1) + " · " + c.texto + "</b></div>" +
+        '<div class="f-item"><span>Ingestão do dia</span><b>' + num(ing, 0) + " kcal</b></div>" +
+      "</div>" +
+      '<p class="f-titulo">Dia alimentar</p>' +
+      '<div class="f-lista">' + linhas + '<div class="f-total"><span>Total</span><span>' + num(ing, 0) + " kcal</span></div></div>" +
+      '<p class="f-titulo">Projeção</p>' +
+      "<p>Em " + estado.semanas + " semanas: <b>" + num(fim, 1) + " kg</b> pelo modelo dinâmico, contra " +
+      num(estado.peso - ((gasto - ing) * estado.semanas * 7) / 7700, 1) + " kg pela regra simples de 7.700 kcal por quilo.</p>" +
+      '<p class="f-assina">Atendido por: ______________________________</p>';
+  }
+
+  /* ---------------- monitor + navegação ---------------- */
+  var ROTULOS = ["Ver a leitura", "Montar o meu dia", "Ver o balanço", "Gerar relatório"];
+
+  function irPara(n) {
+    estado.passo = n;
+    for (var i = 1; i <= 4; i++) $("passo-" + i).hidden = i !== n;
+    Array.prototype.forEach.call($("etapas").querySelectorAll(".etapa"), function (b) {
+      var k = parseInt(b.dataset.ir, 10);
+      b.setAttribute("aria-current", k === n ? "step" : "false");
+      b.querySelector("i").style.setProperty("--p", k < n ? "100%" : (k === n ? "60%" : "0%"));
+    });
+    $("mon-corpo").hidden = n === 3 || n === 4;
+    $("mon-dia").hidden = n !== 3 && n !== 4;
+    $("btn-voltar").hidden = n === 1;
+    $("btn-avancar-txt").textContent = ROTULOS[n - 1];
+    $("btn-avancar")[n === 3 && !diaCompleto() ? "setAttribute" : "removeAttribute"]("disabled", "");
+    if (n === 4) $("relatorio").hidden = true;
+    window.scrollTo({ top: 0, behavior: reduzido ? "auto" : "smooth" });
+    render();
+  }
+
+  $("etapas").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-ir]");
+    if (b) irPara(parseInt(b.dataset.ir, 10));
+  });
+
+  $("btn-avancar").addEventListener("click", function () {
+    if (estado.passo < 4) { irPara(estado.passo + 1); return; }
+    var r = $("relatorio");
+    r.hidden = !r.hidden;
+    $("btn-avancar-txt").textContent = r.hidden ? "Gerar relatório" : "Fechar relatório";
+    if (!r.hidden && !reduzido) r.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  $("btn-voltar").addEventListener("click", function () {
+    if (estado.passo > 1) irPara(estado.passo - 1);
+  });
+
+  $("btn-tema").addEventListener("click", function () {
+    var atual = document.documentElement.getAttribute("data-theme");
+    if (!atual) atual = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    var novo = atual === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", novo);
+    $("tema-nome").textContent = novo === "dark" ? "Escuro" : "Claro";
+  });
+
+  function render() {
+    var t = tmb(), v = vet();
+    contar($("vet"), v, 0);
+    $("vet-nota").textContent = "TMB " + num(Math.round(t), 0) + " kcal × fator " + num(nivelAtual().fator, 3) +
+      " · " + EQS.filter(function (e) { return e.id === estado.equacao; })[0].nome.split("-")[0];
+    $("mon-perfil").textContent = (estado.sexo === "M" ? "Homem" : "Mulher") + " · " + estado.idade + " anos";
+
+    var vi = imc(), c = classificarImc(vi);
+    contar($("mon-imc"), vi, 1);
+    $("mon-imc-chip").textContent = c.texto;
+    $("mon-imc-chip").dataset.estado = c.estado;
+    $("mon-imc-ref").textContent = estado.idade >= 60 ? "Lipschitz · 60+" : "OMS · adultos";
+    $("mon-cin").textContent = estado.cintura + " cm";
+    $("mon-rcq").textContent = num(estado.cintura / estado.quadril, 2);
+    var cortes = cortesCintura();
+    $("mon-cin-ref").textContent = "OMS · ≥ " + cortes[0] + " · ≥ " + cortes[1] + " cm";
+    $("mon-rcq-ref").textContent = "OMS · " + (estado.sexo === "M" ? "homem > 0,90" : "mulher > 0,85");
+
+    var ing = ingerido();
+    contar($("soma-val"), ing, 0);
+    $("soma-alvo").textContent = num(v, 0);
+    $("soma-barra").style.setProperty("--p", Math.min(100, (ing / v) * 100).toFixed(1) + "%");
+    $("mon-dia-n").textContent = respondidas() + " de " + REFEICOES.length;
+    $("soma-lista").innerHTML = REFEICOES.map(function (r) {
+      var e = estado.escolhas[r.id];
+      if (e === undefined || e === null) return '<div class="soma-item"><i></i><span>' + r.nome + "</span><b>—</b></div>";
+      if (e === -1) return '<div class="soma-item"><i></i><span>' + r.nome + " · não faço</span><b>0</b></div>";
+      return '<div class="soma-item"><i class="on"></i><span>' + r.nome + " · " + r.opcoes[e].nome + "</span><b>" + num(r.opcoes[e].kcal, 0) + "</b></div>";
+    }).join("");
+
+    if (estado.passo === 2) renderPasso2();
+    if (estado.passo === 3) {
+      renderPasso3();
+      $("btn-avancar")[diaCompleto() ? "removeAttribute" : "setAttribute"]("disabled", "");
+      $("btn-avancar-txt").textContent = diaCompleto() ? "Ver o balanço" : "Escolha as 6 refeições";
+    }
+    if (estado.passo === 4) renderPasso4();
+  }
+
+  /* ---------------- início ---------------- */
+  document.documentElement.setAttribute("data-theme", "dark");
+  montarTrilha();
+  Object.keys(REGUAS).forEach(pintarRegua);
+  definirSexo(estado.sexo);
+  definirNivel(estado.nivel);
+  irPara(2);
+})();
+</script>

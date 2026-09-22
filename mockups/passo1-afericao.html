@@ -1,0 +1,1424 @@
+<title>Aferição Nutricional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  /* ---------- tokens: claro (base) ---------- */
+  :root {
+    --ground: #F3F6F4;
+    --surface: #FFFFFF;
+    --surface-2: #EAEFEC;
+    --line: #DCE4E0;
+    --line-forte: #C3CFC9;
+    --ink: #0B1310;
+    --ink-2: #5C6E66;
+    --ink-3: #8A9A93;
+    --accent: #00875A;
+    --accent-viva: #00C983;
+    --accent-soft: rgba(0, 201, 131, .12);
+    --accent-ring: rgba(0, 201, 131, .35);
+    --warn: #A96500;
+    --warn-soft: rgba(169, 101, 0, .12);
+    --danger: #BE3A31;
+    --danger-soft: rgba(190, 58, 49, .12);
+    --info: #4478D8;
+    --sombra: 0 1px 2px rgba(11, 19, 16, .04), 0 12px 32px -18px rgba(11, 19, 16, .28);
+    --sombra-alta: 0 2px 4px rgba(11, 19, 16, .05), 0 28px 60px -28px rgba(11, 19, 16, .35);
+    --grade: rgba(11, 19, 16, .045);
+    --brilho: 0 0 0 1px var(--accent-ring), 0 0 34px -6px var(--accent-ring);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #070B0A;
+      --surface: #0E1513;
+      --surface-2: #16201C;
+      --line: #202D28;
+      --line-forte: #2E4038;
+      --ink: #E9F2EE;
+      --ink-2: #8DA398;
+      --ink-3: #64796F;
+      --accent: #2BE39A;
+      --accent-viva: #2BE39A;
+      --accent-soft: rgba(43, 227, 154, .12);
+      --accent-ring: rgba(43, 227, 154, .32);
+      --warn: #E9A13B;
+      --warn-soft: rgba(233, 161, 59, .14);
+      --danger: #FF6F62;
+      --danger-soft: rgba(255, 111, 98, .14);
+      --info: #6FA0FF;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 16px 40px -22px rgba(0, 0, 0, .9);
+      --sombra-alta: 0 2px 6px rgba(0, 0, 0, .55), 0 34px 70px -30px rgba(0, 0, 0, .95);
+      --grade: rgba(233, 242, 238, .05);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #070B0A;
+    --surface: #0E1513;
+    --surface-2: #16201C;
+    --line: #202D28;
+    --line-forte: #2E4038;
+    --ink: #E9F2EE;
+    --ink-2: #8DA398;
+    --ink-3: #64796F;
+    --accent: #2BE39A;
+    --accent-viva: #2BE39A;
+    --accent-soft: rgba(43, 227, 154, .12);
+    --accent-ring: rgba(43, 227, 154, .32);
+    --warn: #E9A13B;
+    --warn-soft: rgba(233, 161, 59, .14);
+    --danger: #FF6F62;
+    --danger-soft: rgba(255, 111, 98, .14);
+    --info: #6FA0FF;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 16px 40px -22px rgba(0, 0, 0, .9);
+    --sombra-alta: 0 2px 6px rgba(0, 0, 0, .55), 0 34px 70px -30px rgba(0, 0, 0, .95);
+    --grade: rgba(233, 242, 238, .05);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* malha de fundo: papel milimetrado de laboratório */
+  .fundo {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(to right, var(--grade) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grade) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(120% 90% at 70% 0%, #000 0%, transparent 72%);
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- topo ---------- */
+  .topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 0 18px;
+  }
+
+  .marca { display: flex; align-items: center; gap: 11px; }
+
+  .marca-selo {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    border-radius: 9px;
+    background: linear-gradient(150deg, var(--accent-viva), var(--accent));
+    box-shadow: 0 6px 18px -8px var(--accent-ring);
+  }
+
+  .marca-nome {
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -.02em;
+  }
+
+  .topo-dir { display: flex; align-items: center; gap: 10px; }
+
+  .selo-proto {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    border: 1px dashed var(--line-forte);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  .btn-tema {
+    display: inline-flex; align-items: center; gap: 7px;
+    font: inherit; font-size: 13px;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 13px 6px 10px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, transform .2s;
+  }
+  .btn-tema:hover { color: var(--ink); border-color: var(--line-forte); transform: translateY(-1px); }
+
+  /* ---------- trilho de progresso das 4 etapas ---------- */
+  .etapas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 6px 0 34px;
+  }
+  .etapa { display: grid; gap: 8px; }
+  .etapa-barra {
+    height: 3px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .etapa-barra i {
+    display: block;
+    height: 100%;
+    width: var(--p, 0%);
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), var(--accent-viva));
+    transition: width .5s cubic-bezier(.22, .8, .24, 1);
+  }
+  .etapa-nome {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .etapa[data-ativa="1"] .etapa-nome { color: var(--ink); }
+
+  /* ---------- palco ---------- */
+  .palco {
+    display: grid;
+    grid-template-columns: minmax(0, 1.32fr) minmax(340px, .68fr);
+    gap: 40px;
+    align-items: start;
+  }
+
+  .coluna { display: grid; gap: 26px; align-content: start; }
+
+  .abertura { display: grid; gap: 12px; max-width: 30ch; }
+
+  .sobrescrito {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sobrescrito::before {
+    content: "";
+    width: 18px; height: 1px;
+    background: currentColor;
+  }
+
+  h1 {
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(32px, 3.6vw, 46px);
+    line-height: 1.02;
+    letter-spacing: -.045em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .lide {
+    color: var(--ink-2);
+    font-size: 16px;
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  /* ---------- campo de linguagem natural ---------- */
+  .ditado {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--sombra);
+    padding: 16px;
+    display: grid;
+    gap: 13px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .ditado:focus-within { border-color: var(--accent-ring); box-shadow: var(--brilho); }
+
+  .ditado-topo {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .ditado-topo b { color: var(--ink-2); font-weight: 500; }
+
+  .ditado-linha {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-2);
+    border-radius: 13px;
+    padding: 4px 4px 4px 14px;
+  }
+
+  .ditado-linha svg { flex: none; color: var(--accent); }
+
+  #frase {
+    flex: 1 1 auto;
+    min-width: 0;
+    font: inherit;
+    font-size: 15.5px;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    padding: 12px 0;
+    outline: none;
+  }
+  #frase::placeholder { color: var(--ink-3); }
+
+  .btn-ler {
+    flex: none;
+    font: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    color: #04150E;
+    background: linear-gradient(145deg, var(--accent-viva), var(--accent));
+    border: 0;
+    border-radius: 10px;
+    padding: 11px 18px;
+    cursor: pointer;
+    transition: transform .18s cubic-bezier(.2, .8, .2, 1), box-shadow .18s, filter .18s;
+  }
+  .btn-ler:hover { transform: translateY(-1px); box-shadow: 0 10px 24px -12px var(--accent-ring); }
+  .btn-ler:active { transform: translateY(0) scale(.985); }
+  .btn-ler[data-lendo="1"] { filter: saturate(.6); pointer-events: none; }
+
+  .exemplos { display: flex; flex-wrap: wrap; gap: 7px; }
+  .exemplo {
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--ink-2);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 11px;
+    cursor: pointer;
+    transition: color .18s, border-color .18s, background .18s;
+  }
+  .exemplo:hover { color: var(--ink); border-color: var(--accent-ring); background: var(--accent-soft); }
+
+  .lidos { display: flex; flex-wrap: wrap; gap: 6px; min-height: 0; }
+  .lidos:empty { display: none; }
+  .lido {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 7px;
+    padding: 4px 8px;
+    animation: surgir .34s cubic-bezier(.2, .8, .2, 1) both;
+  }
+  .lido b { color: var(--ink); font-weight: 500; }
+
+  @keyframes surgir {
+    from { opacity: 0; transform: translateY(6px) scale(.96); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* varredura durante a leitura */
+  .ditado::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 35%, var(--accent-soft) 50%, transparent 65%);
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ditado[data-lendo="1"]::after {
+    opacity: 1;
+    animation: varrer 1s cubic-bezier(.4, 0, .2, 1) infinite;
+  }
+  @keyframes varrer {
+    to { transform: translateX(100%); }
+  }
+
+  /* ---------- instrumentos ---------- */
+  .instrumentos { display: grid; gap: 14px; }
+
+  .inst {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 18px 20px 20px;
+    box-shadow: var(--sombra);
+    transition: border-color .3s, box-shadow .3s, transform .3s;
+  }
+  .inst[data-acende="1"] {
+    border-color: var(--accent-ring);
+    box-shadow: var(--brilho);
+    transform: translateY(-2px);
+  }
+
+  .inst-cab {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .rot {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .rot-obr { color: var(--accent); }
+
+  .leitura {
+    display: flex; align-items: baseline; gap: 6px;
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -.04em;
+    line-height: 1;
+  }
+  .leitura output {
+    font-size: 40px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    transition: color .3s;
+  }
+  .inst[data-acende="1"] .leitura output { color: var(--accent); }
+  .leitura .un {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+
+  /* trilho com escala gravada */
+  .trilho {
+    position: relative;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    overflow: hidden;
+    cursor: grab;
+  }
+  .trilho:active { cursor: grabbing; }
+
+  .ticks {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(90deg, var(--line-forte) 0 1px, transparent 1px);
+    background-size: calc(100% / 24) 100%;
+    opacity: .55;
+  }
+  .ticks::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: linear-gradient(90deg, var(--line-forte) 0 1px, transparent 1px);
+    background-size: calc(100% / 6) 100%;
+    opacity: .9;
+  }
+
+  .preenchido {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--pct, 50%);
+    background: linear-gradient(90deg, var(--accent-soft), var(--accent-soft));
+    border-right: 2px solid var(--accent);
+  }
+
+  .agulha {
+    position: absolute;
+    top: 6px; bottom: 6px;
+    left: var(--pct, 50%);
+    width: 10px;
+    margin-left: -5px;
+    border-radius: 5px;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    pointer-events: none;
+  }
+
+  .trilho[data-suave="1"] .preenchido,
+  .trilho[data-suave="1"] .agulha {
+    transition: width .55s cubic-bezier(.22, .8, .24, 1), left .55s cubic-bezier(.22, .8, .24, 1);
+  }
+
+  .trilho input[type="range"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+  }
+  .trilho:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .escala {
+    display: flex; justify-content: space-between;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    color: var(--ink-3);
+    padding-top: 7px;
+  }
+
+  /* sexo: pastilha deslizante */
+  .duo {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface-2);
+    border-radius: 13px;
+    padding: 4px;
+    gap: 4px;
+  }
+  .duo::before {
+    content: "";
+    position: absolute;
+    top: 4px; bottom: 4px; left: 4px;
+    width: calc(50% - 6px);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--sombra);
+    transform: translateX(var(--x, 0%));
+    transition: transform .38s cubic-bezier(.22, .9, .24, 1);
+  }
+  .duo button {
+    position: relative;
+    font: inherit;
+    font-weight: 500;
+    color: var(--ink-3);
+    background: transparent;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: color .25s;
+  }
+  .duo button[aria-pressed="true"] { color: var(--ink); }
+
+  /* atividade */
+  .atividades {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .ativ {
+    display: grid;
+    gap: 9px;
+    justify-items: start;
+    text-align: left;
+    font: inherit;
+    color: var(--ink-2);
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: 13px;
+    padding: 12px 11px 11px;
+    cursor: pointer;
+    transition: color .22s, background .22s, border-color .22s, transform .22s;
+  }
+  .ativ:hover { transform: translateY(-2px); color: var(--ink); }
+  .ativ[aria-pressed="true"] {
+    color: var(--ink);
+    background: var(--accent-soft);
+    border-color: var(--accent-ring);
+  }
+  .ativ-barras { display: flex; align-items: flex-end; gap: 3px; height: 20px; }
+  .ativ-barras i {
+    width: 4px;
+    border-radius: 2px;
+    background: var(--line-forte);
+    transition: background .22s, height .3s cubic-bezier(.22, .8, .24, 1);
+  }
+  .ativ[aria-pressed="true"] .ativ-barras i.on { background: var(--accent); }
+  .ativ-nome { font-size: 13.5px; font-weight: 600; letter-spacing: -.01em; }
+  .ativ-fator {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .ativ[aria-pressed="true"] .ativ-fator { color: var(--accent); }
+
+  /* medidas opcionais */
+  .opcionais { padding-bottom: 6px; }
+  .op-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .op-titulo { display: grid; gap: 2px; }
+  .op-titulo span:last-child { font-size: 13px; color: var(--ink-2); }
+  .op-seta { transition: transform .35s cubic-bezier(.22, .8, .24, 1); color: var(--ink-3); }
+  .op-cab[aria-expanded="true"] .op-seta { transform: rotate(180deg); }
+
+  .op-corpo {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .45s cubic-bezier(.22, .8, .24, 1);
+  }
+  .op-corpo[data-aberto="1"] { grid-template-rows: 1fr; }
+  .op-corpo > div { overflow: hidden; }
+  .op-grid { display: grid; gap: 18px; padding-top: 18px; }
+
+  /* ---------- monitor ---------- */
+  .monitor {
+    position: sticky;
+    top: 20px;
+    display: grid;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--sombra-alta);
+    overflow: hidden;
+  }
+
+  .mon-secao { padding: 20px 22px; border-bottom: 1px solid var(--line); }
+  .mon-secao:last-child { border-bottom: 0; }
+
+  .mon-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .pulso { display: inline-flex; align-items: center; gap: 7px; }
+  .pulso i {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 var(--accent-ring);
+    animation: bater 2.4s ease-out infinite;
+  }
+  @keyframes bater {
+    0% { box-shadow: 0 0 0 0 var(--accent-ring); }
+    60%, 100% { box-shadow: 0 0 0 9px transparent; }
+  }
+
+  .vet {
+    display: flex; align-items: baseline; gap: 8px;
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -.05em;
+    line-height: .9;
+  }
+  #vet {
+    font-size: clamp(52px, 7vw, 68px);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .vet .un { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: 0; color: var(--ink-3); }
+
+  .vet-nota {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+    padding-top: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .equacoes { display: flex; gap: 6px; padding-top: 14px; }
+  .eq {
+    flex: 1;
+    font: inherit;
+    font-size: 12px;
+    color: var(--ink-2);
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 7px 4px;
+    cursor: pointer;
+    transition: color .2s, background .2s, border-color .2s;
+  }
+  .eq:hover { color: var(--ink); }
+  .eq[aria-pressed="true"] { color: var(--accent); border-color: var(--accent-ring); background: var(--accent-soft); }
+
+  .imc-linha { display: flex; align-items: center; gap: 18px; }
+  .imc-valor {
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -.04em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .gauge { flex: none; }
+  .gauge .agulha-imc { transition: transform .55s cubic-bezier(.22, .8, .24, 1); transform-origin: 100px 92px; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 4px 11px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+  }
+  .chip[data-estado="bom"] { background: var(--accent-soft); color: var(--accent); }
+  .chip[data-estado="alerta"] { background: var(--warn-soft); color: var(--warn); }
+  .chip[data-estado="risco"] { background: var(--danger-soft); color: var(--danger); }
+
+  .medidas-lista { display: grid; gap: 12px; }
+  .medida {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .medida-rot { display: grid; gap: 1px; }
+  .medida-rot b {
+    font-weight: 500;
+    font-size: 13.5px;
+  }
+  .medida-rot span {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    color: var(--ink-3);
+  }
+  .medida-val {
+    font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .vazio { color: var(--ink-3); font-size: 13px; }
+
+  .mon-rodape {
+    display: grid;
+    gap: 12px;
+    background: var(--surface-2);
+  }
+
+  .btn-avancar {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%;
+    font: inherit;
+    font-weight: 600;
+    font-size: 15.5px;
+    color: #04150E;
+    background: linear-gradient(140deg, var(--accent-viva), var(--accent));
+    border: 0;
+    border-radius: 13px;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s;
+  }
+  .btn-avancar:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -16px var(--accent-ring); }
+  .btn-avancar:active { transform: translateY(0) scale(.99); }
+  .btn-avancar svg { transition: transform .25s; }
+  .btn-avancar:hover svg { transform: translateX(3px); }
+
+  .nota-rodape {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: var(--ink-3);
+    text-align: center;
+  }
+
+  .creditos {
+    padding-top: 34px;
+    font-size: 12.5px;
+    color: var(--ink-3);
+    display: flex; flex-wrap: wrap; gap: 6px 16px;
+  }
+
+  /* ---------- responsivo ---------- */
+  @media (max-width: 980px) {
+    .palco { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+    .monitor { position: static; }
+    .atividades { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 560px) {
+    .app { padding: 0 16px 72px; }
+    .etapas { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .etapa-nome { font-size: 9px; letter-spacing: .06em; }
+    .ditado-linha { flex-wrap: wrap; padding: 10px; }
+    #frase { flex-basis: 100%; padding: 4px 4px 10px; }
+    .btn-ler { width: 100%; }
+    .leitura output { font-size: 34px; }
+    .atividades { grid-template-columns: 1fr; }
+    .ativ { grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+    .ativ-barras { height: 16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+    }
+  }
+</style>
+
+<div class="fundo"></div>
+
+<div class="app">
+  <header class="topo">
+    <div class="marca">
+      <span class="marca-selo" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#04150E" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20c0-8 5-13 15-14 1 10-4 15-12 15H4z"></path>
+          <path d="M6 18c3-4 6-6 9-7"></path>
+        </svg>
+      </span>
+      <span class="marca-nome">Balanço Nutricional</span>
+    </div>
+    <div class="topo-dir">
+      <span class="selo-proto">protótipo v2</span>
+      <button class="btn-tema" id="btn-tema" type="button" aria-live="polite">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <span id="tema-nome">Claro</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="etapas" aria-label="Progresso da avaliação">
+    <div class="etapa" data-ativa="1"><div class="etapa-barra"><i id="p1" style="--p:0%"></i></div><span class="etapa-nome">1 · Aferição</span></div>
+    <div class="etapa"><div class="etapa-barra"><i style="--p:0%"></i></div><span class="etapa-nome">2 · Resultados</span></div>
+    <div class="etapa"><div class="etapa-barra"><i style="--p:0%"></i></div><span class="etapa-nome">3 · Refeições</span></div>
+    <div class="etapa"><div class="etapa-barra"><i style="--p:0%"></i></div><span class="etapa-nome">4 · Balanço</span></div>
+  </nav>
+
+  <main class="palco">
+    <section class="coluna">
+      <div class="abertura">
+        <p class="sobrescrito">Aferição</p>
+        <h1>Duas medidas e a gente já sabe o seu gasto.</h1>
+        <p class="lide">Arraste as réguas ou descreva você mesmo em uma frase. O cálculo acontece enquanto você mexe — nada sai deste aparelho.</p>
+      </div>
+
+      <div class="ditado" id="ditado">
+        <div class="ditado-topo">
+          <span><b>Descreva-se</b> — a gente preenche</span>
+          <span>interpretação local</span>
+        </div>
+        <div class="ditado-linha">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"></path>
+            <path d="M18.5 15.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9z"></path>
+          </svg>
+          <input id="frase" type="text" autocomplete="off" spellcheck="false" placeholder="mulher de 42 anos, 68 kg, 1,62 m, caminha 3x por semana">
+          <button class="btn-ler" id="btn-ler" type="button">Preencher</button>
+        </div>
+        <div class="exemplos" id="exemplos"></div>
+        <div class="lidos" id="lidos" aria-live="polite"></div>
+      </div>
+
+      <div class="instrumentos">
+        <div class="inst" data-campo="sexo">
+          <div class="inst-cab">
+            <span class="rot rot-obr">Sexo biológico</span>
+          </div>
+          <div class="duo" id="duo" style="--x:0%">
+            <button type="button" data-sexo="M" aria-pressed="true">Masculino</button>
+            <button type="button" data-sexo="F" aria-pressed="false">Feminino</button>
+          </div>
+        </div>
+
+        <div class="inst" data-campo="idade">
+          <div class="inst-cab">
+            <span class="rot rot-obr">Idade</span>
+            <span class="leitura"><output id="out-idade">35</output><span class="un">anos</span></span>
+          </div>
+          <div class="trilho" data-trilho="idade">
+            <div class="ticks"></div>
+            <div class="preenchido"></div>
+            <div class="agulha"></div>
+            <input type="range" id="r-idade" min="12" max="90" step="1" value="35" aria-label="Idade em anos">
+          </div>
+          <div class="escala"><span>12</span><span>90</span></div>
+        </div>
+
+        <div class="inst" data-campo="peso">
+          <div class="inst-cab">
+            <span class="rot rot-obr">Peso</span>
+            <span class="leitura"><output id="out-peso">82,0</output><span class="un">kg</span></span>
+          </div>
+          <div class="trilho" data-trilho="peso">
+            <div class="ticks"></div>
+            <div class="preenchido"></div>
+            <div class="agulha"></div>
+            <input type="range" id="r-peso" min="35" max="180" step="0.5" value="82" aria-label="Peso em quilos">
+          </div>
+          <div class="escala"><span>35</span><span>180</span></div>
+        </div>
+
+        <div class="inst" data-campo="altura">
+          <div class="inst-cab">
+            <span class="rot rot-obr">Altura</span>
+            <span class="leitura"><output id="out-altura">1,78</output><span class="un">m</span></span>
+          </div>
+          <div class="trilho" data-trilho="altura">
+            <div class="ticks"></div>
+            <div class="preenchido"></div>
+            <div class="agulha"></div>
+            <input type="range" id="r-altura" min="130" max="215" step="1" value="178" aria-label="Altura em centímetros">
+          </div>
+          <div class="escala"><span>1,30</span><span>2,15</span></div>
+        </div>
+
+        <div class="inst" data-campo="atividade">
+          <div class="inst-cab">
+            <span class="rot rot-obr">Rotina de movimento</span>
+            <span class="rot" id="ativ-desc">Exercício moderado 3 a 5 vezes por semana</span>
+          </div>
+          <div class="atividades" id="atividades"></div>
+        </div>
+
+        <div class="inst opcionais">
+          <button class="op-cab" id="op-cab" type="button" aria-expanded="true" aria-controls="op-corpo">
+            <span class="op-titulo">
+              <span class="rot">Fita métrica · opcional</span>
+              <span>Cintura e quadril liberam o risco cardiovascular</span>
+            </span>
+            <svg class="op-seta" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="op-corpo" id="op-corpo" data-aberto="1">
+            <div>
+              <div class="op-grid">
+                <div data-campo="cintura">
+                  <div class="inst-cab">
+                    <span class="rot">Cintura</span>
+                    <span class="leitura"><output id="out-cintura">96</output><span class="un">cm</span></span>
+                  </div>
+                  <div class="trilho" data-trilho="cintura">
+                    <div class="ticks"></div>
+                    <div class="preenchido"></div>
+                    <div class="agulha"></div>
+                    <input type="range" id="r-cintura" min="50" max="160" step="1" value="96" aria-label="Circunferência da cintura em centímetros">
+                  </div>
+                  <div class="escala"><span>50</span><span>160</span></div>
+                </div>
+                <div data-campo="quadril">
+                  <div class="inst-cab">
+                    <span class="rot">Quadril</span>
+                    <span class="leitura"><output id="out-quadril">102</output><span class="un">cm</span></span>
+                  </div>
+                  <div class="trilho" data-trilho="quadril">
+                    <div class="ticks"></div>
+                    <div class="preenchido"></div>
+                    <div class="agulha"></div>
+                    <input type="range" id="r-quadril" min="60" max="170" step="1" value="102" aria-label="Circunferência do quadril em centímetros">
+                  </div>
+                  <div class="escala"><span>60</span><span>170</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="monitor" aria-label="Leitura ao vivo">
+      <div class="mon-secao">
+        <div class="mon-cab">
+          <span class="rot pulso"><i aria-hidden="true"></i> Leitura ao vivo</span>
+          <span class="rot" id="mon-perfil">Homem · 35 anos</span>
+        </div>
+        <div class="vet"><span id="vet">2732</span><span class="un">kcal / dia</span></div>
+        <div class="vet-nota" id="vet-nota">TMB 1.763 kcal × fator 1,550</div>
+        <div class="equacoes" id="equacoes">
+          <button class="eq" type="button" data-eq="mifflin" aria-pressed="true">Mifflin</button>
+          <button class="eq" type="button" data-eq="harris" aria-pressed="false">Harris-Benedict</button>
+          <button class="eq" type="button" data-eq="fao" aria-pressed="false">FAO/OMS</button>
+        </div>
+      </div>
+
+      <div class="mon-secao">
+        <div class="mon-cab"><span class="rot">Índice de massa corporal</span></div>
+        <div class="imc-linha">
+          <svg class="gauge" width="200" height="104" viewBox="0 0 200 104" role="img" aria-labelledby="gauge-titulo">
+            <title id="gauge-titulo">Faixa de IMC</title>
+            <g id="faixas"></g>
+            <g class="agulha-imc" id="agulha-imc">
+              <line x1="100" y1="92" x2="100" y2="26" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"></line>
+            </g>
+            <circle cx="100" cy="92" r="6.5" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"></circle>
+          </svg>
+          <div>
+            <div class="imc-valor" id="imc-valor">25,9</div>
+            <div style="padding-top:8px"><span class="chip" id="imc-chip" data-estado="alerta">Sobrepeso</span></div>
+            <div class="rot" id="imc-ref" style="padding-top:8px">Classificação OMS · adultos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mon-secao">
+        <div class="mon-cab"><span class="rot">Risco cardiovascular</span></div>
+        <div class="medidas-lista">
+          <div class="medida">
+            <span class="medida-rot"><b>Cintura</b><span>OMS · ≥ 94 · ≥ 102 cm</span></span>
+            <span style="display:flex;align-items:center;gap:10px">
+              <span class="medida-val" id="cin-val">96 cm</span>
+              <span class="chip" id="cin-chip" data-estado="alerta">Aumentado</span>
+            </span>
+          </div>
+          <div class="medida">
+            <span class="medida-rot"><b>Cintura / quadril</b><span>OMS · homem > 0,90</span></span>
+            <span style="display:flex;align-items:center;gap:10px">
+              <span class="medida-val" id="rcq-val">0,94</span>
+              <span class="chip" id="rcq-chip" data-estado="alerta">Aumentado</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mon-secao mon-rodape">
+        <button class="btn-avancar" type="button" id="btn-avancar">
+          Ver meus resultados
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </button>
+        <p class="nota-rodape">Mock com dados de exemplo · cálculo roda no navegador<br>Ferramenta educativa. Não substitui avaliação com nutricionista.</p>
+      </div>
+    </aside>
+  </main>
+
+  <p class="creditos">
+    <span>Mifflin-St Jeor · Harris-Benedict 1984 · FAO/OMS 2004</span>
+    <span>IMC: OMS (18–59) e Lipschitz (60+)</span>
+  </p>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+
+    var reduzido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    var NIVEIS = [
+      { id: "sedentario", nome: "Sedentário", fator: 1.2, barras: 1, desc: "Pouco ou nenhum exercício, trabalho sentado" },
+      { id: "leve", nome: "Leve", fator: 1.375, barras: 2, desc: "Exercício leve 1 a 3 vezes por semana" },
+      { id: "moderado", nome: "Moderado", fator: 1.55, barras: 3, desc: "Exercício moderado 3 a 5 vezes por semana" },
+      { id: "intenso", nome: "Intenso", fator: 1.725, barras: 4, desc: "Exercício pesado 6 a 7 vezes por semana" },
+      { id: "muito", nome: "Muito intenso", fator: 1.9, barras: 5, desc: "Treino pesado 2x ao dia ou trabalho físico" }
+    ];
+
+    var estado = {
+      sexo: "M", idade: 35, peso: 82, altura: 178,
+      nivel: "moderado", cintura: 96, quadril: 102, equacao: "mifflin"
+    };
+
+    var $ = function (id) { return document.getElementById(id); };
+    var num = function (v, casas) {
+      return v.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+    };
+
+    /* ---------- domínio ---------- */
+    function nivelAtual() {
+      for (var i = 0; i < NIVEIS.length; i++) if (NIVEIS[i].id === estado.nivel) return NIVEIS[i];
+      return NIVEIS[2];
+    }
+
+    function tmb() {
+      var p = estado.peso, a = estado.altura, i = estado.idade, h = estado.sexo === "M";
+      if (estado.equacao === "harris") {
+        return h ? 88.362 + 13.397 * p + 4.799 * a - 5.677 * i
+                 : 447.593 + 9.247 * p + 3.098 * a - 4.330 * i;
+      }
+      if (estado.equacao === "fao") {
+        if (h) {
+          if (i < 30) return 15.057 * p + 692.2;
+          if (i < 60) return 11.472 * p + 873.1;
+          return 11.711 * p + 587.7;
+        }
+        if (i < 30) return 14.818 * p + 486.6;
+        if (i < 60) return 8.126 * p + 845.6;
+        return 9.082 * p + 658.5;
+      }
+      return h ? 10 * p + 6.25 * a - 5 * i + 5
+               : 10 * p + 6.25 * a - 5 * i - 161;
+    }
+
+    function imc() { return estado.peso / Math.pow(estado.altura / 100, 2); }
+
+    function classificarImc(v) {
+      if (estado.idade < 18) return { texto: "Sem classificação", estado: "neutro", ref: "Menor de 18 anos · use curvas de crescimento" };
+      if (estado.idade >= 60) {
+        if (v < 22) return { texto: "Baixo peso", estado: "alerta", ref: "Lipschitz (1994) · 60 anos ou mais" };
+        if (v <= 27) return { texto: "Eutrofia", estado: "bom", ref: "Lipschitz (1994) · 60 anos ou mais" };
+        return { texto: "Sobrepeso", estado: "alerta", ref: "Lipschitz (1994) · 60 anos ou mais" };
+      }
+      if (v < 18.5) return { texto: "Baixo peso", estado: "alerta", ref: "Classificação OMS · adultos" };
+      if (v < 25) return { texto: "Peso adequado", estado: "bom", ref: "Classificação OMS · adultos" };
+      if (v < 30) return { texto: "Sobrepeso", estado: "alerta", ref: "Classificação OMS · adultos" };
+      if (v < 35) return { texto: "Obesidade grau I", estado: "risco", ref: "Classificação OMS · adultos" };
+      if (v < 40) return { texto: "Obesidade grau II", estado: "risco", ref: "Classificação OMS · adultos" };
+      return { texto: "Obesidade grau III", estado: "risco", ref: "Classificação OMS · adultos" };
+    }
+
+    function classificarCintura(cm) {
+      var muito = estado.sexo === "M" ? 102 : 88;
+      var alto = estado.sexo === "M" ? 94 : 80;
+      if (cm >= muito) return { texto: "Muito aumentado", estado: "risco" };
+      if (cm >= alto) return { texto: "Aumentado", estado: "alerta" };
+      return { texto: "Adequado", estado: "bom" };
+    }
+
+    function classificarRcq(r) {
+      var corte = estado.sexo === "M" ? 0.90 : 0.85;
+      return r > corte ? { texto: "Aumentado", estado: "alerta" } : { texto: "Adequado", estado: "bom" };
+    }
+
+    /* ---------- odômetro ---------- */
+    function contar(el, para, casas, sufixo) {
+      var de = parseFloat(String(el.dataset.v || "0"));
+      el.dataset.v = String(para);
+      if (reduzido || Math.abs(para - de) < 0.01) {
+        el.textContent = num(para, casas) + (sufixo || "");
+        return;
+      }
+      var t0 = performance.now(), dur = 420;
+      if (el._raf) cancelAnimationFrame(el._raf);
+      function passo(t) {
+        var k = Math.min(1, (t - t0) / dur);
+        var e = 1 - Math.pow(1 - k, 3);
+        el.textContent = num(de + (para - de) * e, casas) + (sufixo || "");
+        if (k < 1) el._raf = requestAnimationFrame(passo);
+      }
+      el._raf = requestAnimationFrame(passo);
+    }
+
+    /* ---------- réguas ---------- */
+    var REGUAS = {
+      idade: { input: $("r-idade"), out: $("out-idade"), casas: 0, chave: "idade" },
+      peso: { input: $("r-peso"), out: $("out-peso"), casas: 1, chave: "peso" },
+      altura: { input: $("r-altura"), out: $("out-altura"), casas: 2, chave: "altura", mostrar: function (v) { return v / 100; } },
+      cintura: { input: $("r-cintura"), out: $("out-cintura"), casas: 0, chave: "cintura" },
+      quadril: { input: $("r-quadril"), out: $("out-quadril"), casas: 0, chave: "quadril" }
+    };
+
+    Object.keys(REGUAS).forEach(function (k) {
+      var r = REGUAS[k];
+      r.trilho = document.querySelector('[data-trilho="' + k + '"]');
+      r.input.addEventListener("input", function () {
+        r.trilho.dataset.suave = "0";
+        estado[r.chave] = parseFloat(r.input.value);
+        pintarRegua(k);
+        render();
+      });
+    });
+
+    function pintarRegua(k) {
+      var r = REGUAS[k], el = r.input;
+      var min = parseFloat(el.min), max = parseFloat(el.max);
+      var pct = ((parseFloat(el.value) - min) / (max - min)) * 100;
+      r.trilho.style.setProperty("--pct", pct.toFixed(2) + "%");
+      var v = r.mostrar ? r.mostrar(parseFloat(el.value)) : parseFloat(el.value);
+      contar(r.out, v, r.casas);
+    }
+
+    function definirRegua(k, valor, suave) {
+      var r = REGUAS[k];
+      r.input.value = String(valor);
+      estado[r.chave] = parseFloat(r.input.value);
+      r.trilho.dataset.suave = suave ? "1" : "0";
+      pintarRegua(k);
+    }
+
+    /* ---------- sexo ---------- */
+    var duo = $("duo");
+    duo.addEventListener("click", function (ev) {
+      var b = ev.target.closest("button[data-sexo]");
+      if (!b) return;
+      definirSexo(b.dataset.sexo);
+      render();
+    });
+
+    function definirSexo(s) {
+      estado.sexo = s;
+      duo.style.setProperty("--x", s === "M" ? "0%" : "100%");
+      Array.prototype.forEach.call(duo.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-pressed", b.dataset.sexo === s ? "true" : "false");
+      });
+    }
+
+    /* ---------- atividade ---------- */
+    var caixaAtiv = $("atividades");
+    NIVEIS.forEach(function (n) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "ativ";
+      b.dataset.nivel = n.id;
+      b.setAttribute("aria-pressed", n.id === estado.nivel ? "true" : "false");
+      var barras = '<span class="ativ-barras" aria-hidden="true">';
+      for (var i = 1; i <= 5; i++) {
+        barras += '<i class="' + (i <= n.barras ? "on" : "") + '" style="height:' + (4 + i * 3.2) + 'px"></i>';
+      }
+      barras += "</span>";
+      b.innerHTML = barras + '<span class="ativ-nome">' + n.nome + '</span><span class="ativ-fator">×' + num(n.fator, 3) + "</span>";
+      b.title = n.desc;
+      caixaAtiv.appendChild(b);
+    });
+
+    caixaAtiv.addEventListener("click", function (ev) {
+      var b = ev.target.closest("button[data-nivel]");
+      if (!b) return;
+      definirNivel(b.dataset.nivel);
+      render();
+    });
+
+    function definirNivel(id) {
+      estado.nivel = id;
+      Array.prototype.forEach.call(caixaAtiv.querySelectorAll(".ativ"), function (b) {
+        b.setAttribute("aria-pressed", b.dataset.nivel === id ? "true" : "false");
+      });
+      $("ativ-desc").textContent = nivelAtual().desc;
+    }
+
+    /* ---------- equações ---------- */
+    $("equacoes").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button[data-eq]");
+      if (!b) return;
+      estado.equacao = b.dataset.eq;
+      Array.prototype.forEach.call($("equacoes").querySelectorAll(".eq"), function (e) {
+        e.setAttribute("aria-pressed", e.dataset.eq === estado.equacao ? "true" : "false");
+      });
+      render();
+    });
+
+    /* ---------- opcionais ---------- */
+    $("op-cab").addEventListener("click", function () {
+      var aberto = $("op-cab").getAttribute("aria-expanded") === "true";
+      $("op-cab").setAttribute("aria-expanded", aberto ? "false" : "true");
+      $("op-corpo").dataset.aberto = aberto ? "0" : "1";
+    });
+
+    /* ---------- tema ---------- */
+    $("btn-tema").addEventListener("click", function () {
+      var atual = document.documentElement.getAttribute("data-theme");
+      if (!atual) {
+        atual = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      var novo = atual === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", novo);
+      $("tema-nome").textContent = novo === "dark" ? "Escuro" : "Claro";
+    });
+
+    /* ---------- leitura da frase (mock de interpretação) ---------- */
+    var FRASES = [
+      "homem, 35 anos, 82 kg, 1,78 m, treino 3x por semana",
+      "mulher de 63 anos, 71 kg, 1,58 m, sedentária, cintura 89",
+      "tenho 24 anos, 58 kg e 1,65 m, sou mulher e faço academia todo dia"
+    ];
+
+    var caixaEx = $("exemplos");
+    FRASES.forEach(function (f) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "exemplo";
+      b.textContent = f.length > 46 ? f.slice(0, 44) + "…" : f;
+      b.dataset.frase = f;
+      caixaEx.appendChild(b);
+    });
+
+    caixaEx.addEventListener("click", function (ev) {
+      var b = ev.target.closest("button[data-frase]");
+      if (!b) return;
+      $("frase").value = b.dataset.frase;
+      interpretar();
+    });
+
+    $("btn-ler").addEventListener("click", interpretar);
+    $("frase").addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") interpretar();
+    });
+
+    function extrair(texto) {
+      var t = " " + texto.toLowerCase().replace(/\s+/g, " ") + " ";
+      var achados = [];
+      var m;
+
+      if (/\b(mulher|feminin|garota|menina|senhora|sou ela)\b/.test(t)) achados.push({ campo: "sexo", valor: "F", rot: "sexo", texto: "feminino" });
+      else if (/\b(homem|masculin|rapaz|menino|senhor)\b/.test(t)) achados.push({ campo: "sexo", valor: "M", rot: "sexo", texto: "masculino" });
+
+      m = t.match(/(\d{1,3})\s*anos/) || t.match(/idade\s*:?\s*(\d{1,3})/);
+      if (m) achados.push({ campo: "idade", valor: +m[1], rot: "idade", texto: m[1] + " anos" });
+
+      m = t.match(/(\d{2,3}(?:[.,]\d)?)\s*(?:kg|quilos?|kilos?)/);
+      if (m) achados.push({ campo: "peso", valor: parseFloat(m[1].replace(",", ".")), rot: "peso", texto: m[1].replace(".", ",") + " kg" });
+
+      m = t.match(/(\d)[.,](\d{2})\s*m\b/) || t.match(/\b(\d)[.,](\d{2})\b/);
+      if (m) achados.push({ campo: "altura", valor: +m[1] * 100 + +m[2], rot: "altura", texto: m[1] + "," + m[2] + " m" });
+      else {
+        m = t.match(/(\d{3})\s*cm/);
+        if (m) achados.push({ campo: "altura", valor: +m[1], rot: "altura", texto: (+m[1] / 100).toFixed(2).replace(".", ",") + " m" });
+      }
+
+      m = t.match(/cintura\s*(?:de\s*)?(\d{2,3})/);
+      if (m) achados.push({ campo: "cintura", valor: +m[1], rot: "cintura", texto: m[1] + " cm" });
+
+      m = t.match(/quadril\s*(?:de\s*)?(\d{2,3})/);
+      if (m) achados.push({ campo: "quadril", valor: +m[1], rot: "quadril", texto: m[1] + " cm" });
+
+      var nivel = null;
+      if (/muito intenso|2x ao dia|duas vezes por dia|atleta|trabalho físico/.test(t)) nivel = "muito";
+      else if (/intens|pesad|6x|7x|todo dia|todos os dias|6 a 7/.test(t)) nivel = "intenso";
+      else if (/moderad|3x|4x|5x|3 a 5|academia/.test(t)) nivel = "moderado";
+      else if (/leve|caminh|1x|2x|1 a 3/.test(t)) nivel = "leve";
+      else if (/sedentári|parad|não faço|nao faco|escritório|escritorio/.test(t)) nivel = "sedentario";
+      if (nivel) {
+        var n = NIVEIS.filter(function (x) { return x.id === nivel; })[0];
+        achados.push({ campo: "nivel", valor: nivel, rot: "rotina", texto: n.nome.toLowerCase() });
+      }
+
+      return achados;
+    }
+
+    function interpretar() {
+      var texto = $("frase").value.trim();
+      var lidos = $("lidos");
+      lidos.innerHTML = "";
+      if (!texto) {
+        $("frase").focus();
+        return;
+      }
+
+      var achados = extrair(texto);
+      $("ditado").dataset.lendo = "1";
+      $("btn-ler").dataset.lendo = "1";
+
+      window.setTimeout(function () {
+        $("ditado").dataset.lendo = "0";
+        $("btn-ler").dataset.lendo = "0";
+
+        if (!achados.length) {
+          var vazio = document.createElement("span");
+          vazio.className = "lido";
+          vazio.textContent = "não achei medidas nessa frase — tente “32 anos, 70 kg, 1,70 m”";
+          lidos.appendChild(vazio);
+          return;
+        }
+
+        achados.forEach(function (a, i) {
+          window.setTimeout(function () {
+            aplicar(a);
+            var chip = document.createElement("span");
+            chip.className = "lido";
+            chip.innerHTML = a.rot + " · <b>" + a.texto + "</b>";
+            lidos.appendChild(chip);
+            render();
+          }, reduzido ? 0 : i * 130);
+        });
+      }, reduzido ? 0 : 480);
+    }
+
+    function aplicar(a) {
+      var alvo = null;
+      if (a.campo === "sexo") { definirSexo(a.valor); alvo = document.querySelector('[data-campo="sexo"]'); }
+      else if (a.campo === "nivel") { definirNivel(a.valor); alvo = document.querySelector('[data-campo="atividade"]'); }
+      else {
+        var r = REGUAS[a.campo];
+        var v = Math.min(parseFloat(r.input.max), Math.max(parseFloat(r.input.min), a.valor));
+        definirRegua(a.campo, v, true);
+        alvo = document.querySelector('[data-campo="' + a.campo + '"]');
+        if (alvo && !alvo.classList.contains("inst")) alvo = alvo.closest(".inst") || alvo;
+      }
+      if (alvo) {
+        alvo.dataset.acende = "1";
+        window.setTimeout(function () { alvo.dataset.acende = "0"; }, 900);
+      }
+    }
+
+    /* ---------- faixas do mostrador, na mesma escala da agulha ---------- */
+    var IMC_MIN = 15, IMC_MAX = 40;
+
+    function ponto(v) {
+      var t = (Math.min(IMC_MAX, Math.max(IMC_MIN, v)) - IMC_MIN) / (IMC_MAX - IMC_MIN);
+      var rad = (180 - t * 180) * Math.PI / 180;
+      return [100 + 84 * Math.cos(rad), 92 - 84 * Math.sin(rad)];
+    }
+
+    function arco(a, b, cor) {
+      var p1 = ponto(a), p2 = ponto(b);
+      var d = "M" + p1[0].toFixed(1) + " " + p1[1].toFixed(1) +
+              " A84 84 0 0 1 " + p2[0].toFixed(1) + " " + p2[1].toFixed(1);
+      return '<path d="' + d + '" fill="none" stroke="' + cor + '" stroke-width="9" stroke-linecap="round"></path>';
+    }
+
+    var faixasAtuais = "";
+    function desenharFaixas() {
+      var f;
+      if (estado.idade < 18) {
+        f = [[15, 40, "var(--line-forte)"]];
+      } else if (estado.idade >= 60) {
+        f = [[15, 22, "var(--info)"], [22, 27, "var(--accent)"], [27, 40, "var(--warn)"]];
+      } else {
+        f = [[15, 18.5, "var(--info)"], [18.5, 25, "var(--accent)"], [25, 30, "var(--warn)"], [30, 40, "var(--danger)"]];
+      }
+      var chave = JSON.stringify(f);
+      if (chave === faixasAtuais) return;
+      faixasAtuais = chave;
+      $("faixas").innerHTML = f.map(function (x) {
+        return arco(x[0] + 0.35, x[1] - 0.35, x[2]);
+      }).join("");
+    }
+
+    /* ---------- render do monitor ---------- */
+    function render() {
+      var t = tmb();
+      var fator = nivelAtual().fator;
+      var vet = Math.round(t * fator);
+
+      contar($("vet"), vet, 0);
+      $("vet-nota").textContent = "TMB " + num(Math.round(t), 0) + " kcal × fator " + num(fator, 3);
+      $("mon-perfil").textContent = (estado.sexo === "M" ? "Homem" : "Mulher") + " · " + estado.idade + " anos";
+
+      var v = imc();
+      contar($("imc-valor"), v, 1);
+      var c = classificarImc(v);
+      $("imc-chip").textContent = c.texto;
+      $("imc-chip").dataset.estado = c.estado;
+      $("imc-ref").textContent = c.ref;
+
+      desenharFaixas();
+      var ang = Math.min(90, Math.max(-90, ((Math.min(40, Math.max(15, v)) - 15) / 25) * 180 - 90));
+      $("agulha-imc").style.transform = "rotate(" + ang.toFixed(1) + "deg)";
+
+      var cin = classificarCintura(estado.cintura);
+      $("cin-val").textContent = estado.cintura + " cm";
+      $("cin-chip").textContent = cin.texto;
+      $("cin-chip").dataset.estado = cin.estado;
+      document.querySelector('.medida-rot span').textContent = estado.sexo === "M"
+        ? "OMS · ≥ 94 · ≥ 102 cm" : "OMS · ≥ 80 · ≥ 88 cm";
+
+      var rcq = estado.cintura / estado.quadril;
+      var cr = classificarRcq(rcq);
+      $("rcq-val").textContent = num(rcq, 2);
+      $("rcq-chip").textContent = cr.texto;
+      $("rcq-chip").dataset.estado = cr.estado;
+      document.querySelectorAll(".medida-rot span")[1].textContent = estado.sexo === "M"
+        ? "OMS · homem > 0,90" : "OMS · mulher > 0,85";
+
+      $("p1").style.setProperty("--p", "100%");
+    }
+
+    $("btn-avancar").addEventListener("click", function () {
+      var b = $("btn-avancar");
+      var antes = b.innerHTML;
+      b.innerHTML = "Passo 2 do protótipo ainda não existe";
+      window.setTimeout(function () { b.innerHTML = antes; }, 1600);
+    });
+
+    /* estado inicial: exemplo já carregado */
+    Object.keys(REGUAS).forEach(pintarRegua);
+    definirSexo(estado.sexo);
+    definirNivel(estado.nivel);
+    render();
+  })();
+</script>
