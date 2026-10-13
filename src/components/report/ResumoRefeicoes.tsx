@@ -33,7 +33,7 @@ function montarLinha(refeicao: (typeof REFEICOES)[number], escolhas: Escolhas): 
     if (escolha.kcal <= 0) {
       return { nome: refeicao.nome, texto: 'Não respondido', foto: null, kcal: 0, destacado: true }
     }
-    return { nome: refeicao.nome, texto: 'Informado manualmente', foto: null, kcal: escolha.kcal, destacado: false }
+    return { nome: refeicao.nome, texto: escolha.descricao?.trim() || 'Informado manualmente', foto: null, kcal: escolha.kcal, destacado: false }
   }
 
   const opcao = refeicao.opcoes.find((o) => o.id === escolha.opcaoId)

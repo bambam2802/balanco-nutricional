@@ -70,6 +70,19 @@ describe('sanitizarEstado (sessionStorage corrompido ou de versão antiga)', () 
     expect(r.escolhas).toEqual({ cafe: { tipo: 'manual', kcal: 350 } })
   })
 
+  it('mantém descrição do manual aparada e limitada', () => {
+    const r = sanitizarEstado({
+      escolhas: {
+        cafe: { tipo: 'manual', kcal: 200, descricao: '  2 ovos e pão  ' },
+        almoco: { tipo: 'manual', kcal: 200, descricao: 'x'.repeat(500) },
+        jantar: { tipo: 'manual', kcal: 200, descricao: '   ' },
+      },
+    })
+    expect(r.escolhas.cafe).toEqual({ tipo: 'manual', kcal: 200, descricao: '2 ovos e pão' })
+    expect(r.escolhas.almoco).toMatchObject({ descricao: 'x'.repeat(120) })
+    expect(r.escolhas.jantar).toEqual({ tipo: 'manual', kcal: 200 })
+  })
+
   it('remove escolhas malformadas e de refeições desconhecidas', () => {
     const r = sanitizarEstado({
       escolhas: {

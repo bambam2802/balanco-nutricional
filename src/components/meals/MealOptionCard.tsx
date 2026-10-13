@@ -1,6 +1,6 @@
 import { Ban, Check, Pencil, Utensils } from 'lucide-react'
 import { useState } from 'react'
-import { KCAL_MANUAL_MAX, type Escolha, type OpcaoRefeicao } from '../../domain/types'
+import { DESCRICAO_MANUAL_MAX, KCAL_MANUAL_MAX, type Escolha, type OpcaoRefeicao } from '../../domain/types'
 import { formatarKcal } from '../../domain/formatar'
 import { Badge } from '../ui/Badge'
 
@@ -99,11 +99,22 @@ export function MealManualCard({ escolha, onEscolher }: MealManualCardProps) {
   const selecionada = Boolean(escolha)
   const [texto, setTexto] = useState(escolha && escolha.kcal > 0 ? String(escolha.kcal) : '')
 
+  const [descricao, setDescricao] = useState(escolha?.descricao ?? '')
+
+  function emitir(textoKcal: string, textoDescricao: string) {
+    const kcal = Math.min(Number(textoKcal) || 0, KCAL_MANUAL_MAX)
+    onEscolher({ tipo: 'manual', kcal, descricao: textoDescricao })
+  }
+
   function digitar(bruto: string) {
     const limpo = bruto.replace(/\D/g, '').slice(0, 4)
     setTexto(limpo)
-    const kcal = Math.min(Number(limpo) || 0, KCAL_MANUAL_MAX)
-    onEscolher({ tipo: 'manual', kcal })
+    emitir(limpo, descricao)
+  }
+
+  function descrever(bruto: string) {
+    setDescricao(bruto)
+    emitir(texto, bruto)
   }
 
   return (
@@ -116,7 +127,7 @@ export function MealManualCard({ escolha, onEscolher }: MealManualCardProps) {
       <button
         type="button"
         aria-pressed={selecionada}
-        onClick={() => onEscolher({ tipo: 'manual', kcal: escolha?.kcal ?? 0 })}
+        onClick={() => onEscolher({ tipo: 'manual', kcal: escolha?.kcal ?? 0, descricao })}
         className="flex flex-1 cursor-pointer items-center gap-3 text-left"
       >
         <span
@@ -129,22 +140,33 @@ export function MealManualCard({ escolha, onEscolher }: MealManualCardProps) {
         </span>
         <span className="flex flex-col">
           <span className="text-sm font-semibold text-ink">Nenhuma opção, inserir kcal manualmente</span>
-          <span className="text-xs text-ink-2">Digite as calorias desta refeição</span>
+          <span className="text-xs text-ink-2">Descreva a refeição e digite as calorias</span>
         </span>
       </button>
       {selecionada && (
-        <div className="relative w-full sm:w-40">
+        <div className="flex w-full flex-col gap-2 sm:w-[28rem] sm:flex-row">
           <input
             type="text"
-            inputMode="numeric"
             autoFocus
-            aria-label="Calorias desta refeição"
-            placeholder="Ex.: 350"
-            value={texto}
-            onChange={(e) => digitar(e.target.value)}
-            className="h-11 w-full rounded-lg border border-border bg-surface px-3 pr-12 text-base text-ink outline-none focus:border-brand"
+            maxLength={DESCRICAO_MANUAL_MAX}
+            aria-label="O que é esta refeição"
+            placeholder="O que come? Ex.: 2 ovos mexidos e 1 pão"
+            value={descricao}
+            onChange={(e) => descrever(e.target.value)}
+            className="h-11 w-full min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 text-base text-ink outline-none focus:border-brand"
           />
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-ink-3">kcal</span>
+          <div className="relative w-full shrink-0 sm:w-32">
+            <input
+              type="text"
+              inputMode="numeric"
+              aria-label="Calorias desta refeição"
+              placeholder="Ex.: 350"
+              value={texto}
+              onChange={(e) => digitar(e.target.value)}
+              className="h-11 w-full rounded-lg border border-border bg-surface px-3 pr-12 text-base text-ink outline-none focus:border-brand"
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-ink-3">kcal</span>
+          </div>
         </div>
       )}
     </div>
