@@ -1,3 +1,4 @@
+import fotoCafeComLeite from '../assets/cafe-com-leite.jpg'
 import type { Refeicao, OpcaoRefeicao, RefeicaoId } from '../domain/types'
 
 export const REFEICOES: Refeicao[] = [
@@ -6,6 +7,14 @@ export const REFEICOES: Refeicao[] = [
     nome: 'Café da manhã',
     horario: '7h',
     opcoes: [
+      {
+        id: 'cafe-5',
+        nome: 'Copo de leite com café e adoçante',
+        descricao: '1 copo (200 ml) de leite integral com café e adoçante',
+        kcal: 130,
+        nivel: 1,
+        foto: fotoCafeComLeite,
+      },
       {
         id: 'cafe-1',
         nome: 'Frutas com iogurte e aveia',
