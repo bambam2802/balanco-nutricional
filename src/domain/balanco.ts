@@ -5,7 +5,7 @@ export const TOLERANCIA_NORMO = 0.05
 
 /**
  * Soma as calorias das escolhas do dia alimentar. Refeição sem escolha ou
- * marcada como 'nao_faco' conta 0 kcal; opcaoId desconhecido também conta 0.
+ * marcada como 'nao_faco' conta 0 kcal; 'manual' conta as kcal digitadas; opcaoId desconhecido também conta 0.
  */
 export function somarCalorias(escolhas: Escolhas, refeicoes: Refeicao[]): number {
   let total = 0
@@ -13,6 +13,10 @@ export function somarCalorias(escolhas: Escolhas, refeicoes: Refeicao[]): number
   for (const refeicao of refeicoes) {
     const escolha = escolhas[refeicao.id]
     if (!escolha || escolha.tipo === 'nao_faco') continue
+    if (escolha.tipo === 'manual') {
+      total += escolha.kcal
+      continue
+    }
 
     const opcao = refeicao.opcoes.find((o) => o.id === escolha.opcaoId)
     if (opcao) total += opcao.kcal

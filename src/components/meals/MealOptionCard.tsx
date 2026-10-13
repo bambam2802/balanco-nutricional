@@ -1,6 +1,6 @@
-import { Ban, Check, Utensils } from 'lucide-react'
+import { Ban, Check, Pencil, Utensils } from 'lucide-react'
 import { useState } from 'react'
-import type { OpcaoRefeicao } from '../../domain/types'
+import { KCAL_MANUAL_MAX, type Escolha, type OpcaoRefeicao } from '../../domain/types'
 import { formatarKcal } from '../../domain/formatar'
 import { Badge } from '../ui/Badge'
 
@@ -87,5 +87,66 @@ export function MealNaoFacoCard({ selecionada, onSelect }: MealNaoFacoCardProps)
         <span className="text-xs text-ink-2">Pulo esse horário no meu dia a dia</span>
       </span>
     </button>
+  )
+}
+
+interface MealManualCardProps {
+  escolha: Extract<Escolha, { tipo: 'manual' }> | undefined
+  onEscolher: (escolha: Escolha) => void
+}
+
+export function MealManualCard({ escolha, onEscolher }: MealManualCardProps) {
+  const selecionada = Boolean(escolha)
+  const [texto, setTexto] = useState(escolha && escolha.kcal > 0 ? String(escolha.kcal) : '')
+
+  function digitar(bruto: string) {
+    const limpo = bruto.replace(/\D/g, '').slice(0, 4)
+    setTexto(limpo)
+    const kcal = Math.min(Number(limpo) || 0, KCAL_MANUAL_MAX)
+    onEscolher({ tipo: 'manual', kcal })
+  }
+
+  return (
+    <div
+      className={[
+        'flex w-full flex-col gap-3 rounded-card border-2 border-dashed bg-surface px-4 py-3 text-left transition-all duration-150 sm:col-span-2 sm:flex-row sm:items-center lg:col-span-4',
+        selecionada ? 'border-brand ring-2 ring-brand bg-brand-soft' : 'border-border-strong hover:border-ink-3',
+      ].join(' ')}
+    >
+      <button
+        type="button"
+        aria-pressed={selecionada}
+        onClick={() => onEscolher({ tipo: 'manual', kcal: escolha?.kcal ?? 0 })}
+        className="flex flex-1 cursor-pointer items-center gap-3 text-left"
+      >
+        <span
+          className={[
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+            selecionada ? 'bg-brand text-white' : 'bg-surface-2 text-ink-3',
+          ].join(' ')}
+        >
+          {selecionada ? <Check size={18} strokeWidth={3} /> : <Pencil size={18} />}
+        </span>
+        <span className="flex flex-col">
+          <span className="text-sm font-semibold text-ink">Nenhuma opção, inserir kcal manualmente</span>
+          <span className="text-xs text-ink-2">Digite as calorias desta refeição</span>
+        </span>
+      </button>
+      {selecionada && (
+        <div className="relative w-full sm:w-40">
+          <input
+            type="text"
+            inputMode="numeric"
+            autoFocus
+            aria-label="Calorias desta refeição"
+            placeholder="Ex.: 350"
+            value={texto}
+            onChange={(e) => digitar(e.target.value)}
+            className="h-11 w-full rounded-lg border border-border bg-surface px-3 pr-12 text-base text-ink outline-none focus:border-brand"
+          />
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-ink-3">kcal</span>
+        </div>
+      )}
+    </div>
   )
 }

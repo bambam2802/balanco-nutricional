@@ -43,6 +43,14 @@ describe('somarCalorias', () => {
     expect(somarCalorias(escolhas, refeicoes)).toBe(0)
   })
 
+  it('manual soma as kcal digitadas', () => {
+    const escolhas: Escolhas = {
+      cafe: { tipo: 'manual', kcal: 350 },
+      almoco: { tipo: 'opcao', opcaoId: 'almoco-1' },
+    }
+    expect(somarCalorias(escolhas, refeicoes)).toBe(1150)
+  })
+
   it('todas as refeições escolhidas somam corretamente', () => {
     const escolhas: Escolhas = {
       cafe: { tipo: 'opcao', opcaoId: 'cafe-pesado' },

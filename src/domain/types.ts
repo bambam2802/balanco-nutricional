@@ -93,7 +93,14 @@ export interface Refeicao {
   opcoes: OpcaoRefeicao[]
 }
 
-export type Escolha = { tipo: 'opcao'; opcaoId: string } | { tipo: 'nao_faco' }
+export type Escolha =
+  | { tipo: 'opcao'; opcaoId: string }
+  | { tipo: 'nao_faco' }
+  /** kcal digitadas pelo profissional quando nenhuma opção do cardápio serve (0 = ainda não preenchido). */
+  | { tipo: 'manual'; kcal: number }
+
+/** Máximo aceito no campo manual de uma refeição. */
+export const KCAL_MANUAL_MAX = 3000
 
 export type Escolhas = Partial<Record<RefeicaoId, Escolha>>
 

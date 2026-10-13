@@ -88,7 +88,7 @@ export function StepRefeicoes() {
         vet={vet}
         onVoltar={voltar}
         onAvancar={avancar}
-        avancarDesabilitado={!escolha}
+        avancarDesabilitado={!escolha || (escolha.tipo === 'manual' && escolha.kcal <= 0)}
         isUltima={ultima}
       />
     </div>

@@ -1,4 +1,4 @@
-import type { DadosPessoa, Equacao, Escolha, Escolhas, RefeicaoId } from '../domain/types'
+import { KCAL_MANUAL_MAX, type DadosPessoa, type Equacao, type Escolha, type Escolhas, type RefeicaoId } from '../domain/types'
 import { REFEICOES } from '../data/refeicoes'
 import { NIVEIS_ATIVIDADE } from '../data/atividade'
 import { EQUACOES } from '../data/equacoes'
@@ -82,8 +82,10 @@ function sanitizarEscolhas(bruto: unknown): Escolhas {
   for (const refeicao of REFEICOES) {
     const e = (bruto as Record<string, unknown>)[refeicao.id]
     if (!e || typeof e !== 'object') continue
-    const { tipo, opcaoId } = e as Record<string, unknown>
+    const { tipo, opcaoId, kcal } = e as Record<string, unknown>
     if (tipo === 'nao_faco') resultado[refeicao.id] = { tipo: 'nao_faco' }
+    else if (tipo === 'manual' && typeof kcal === 'number' && Number.isFinite(kcal) && kcal >= 0 && kcal <= KCAL_MANUAL_MAX)
+      resultado[refeicao.id] = { tipo: 'manual', kcal: Math.round(kcal) }
     else if (tipo === 'opcao' && typeof opcaoId === 'string') resultado[refeicao.id] = { tipo: 'opcao', opcaoId }
   }
   return resultado

@@ -58,6 +58,18 @@ describe('sanitizarEstado (sessionStorage corrompido ou de versão antiga)', () 
     expect(sanitizarEstado({ refeicaoAtual: 'abc' }).refeicaoAtual).toBe(0)
   })
 
+  it('aceita manual válido e descarta kcal inválida', () => {
+    const r = sanitizarEstado({
+      escolhas: {
+        cafe: { tipo: 'manual', kcal: 350.4 },
+        almoco: { tipo: 'manual', kcal: -5 },
+        jantar: { tipo: 'manual', kcal: 99999 },
+        ceia: { tipo: 'manual' },
+      },
+    })
+    expect(r.escolhas).toEqual({ cafe: { tipo: 'manual', kcal: 350 } })
+  })
+
   it('remove escolhas malformadas e de refeições desconhecidas', () => {
     const r = sanitizarEstado({
       escolhas: {

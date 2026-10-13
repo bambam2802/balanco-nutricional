@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { Escolha, Refeicao } from '../../domain/types'
-import { MealNaoFacoCard, MealOptionCard } from './MealOptionCard'
+import { MealManualCard, MealNaoFacoCard, MealOptionCard } from './MealOptionCard'
 
 interface MealScreenProps {
   refeicao: Refeicao
@@ -41,6 +41,10 @@ export function MealScreen({ refeicao, indice, total, escolha, onEscolher }: Mea
             onSelect={() => onEscolher({ tipo: 'opcao', opcaoId: opcao.id })}
           />
         ))}
+        <MealManualCard
+          escolha={escolha?.tipo === 'manual' ? escolha : undefined}
+          onEscolher={onEscolher}
+        />
         <MealNaoFacoCard
           selecionada={escolha?.tipo === 'nao_faco'}
           onSelect={() => onEscolher({ tipo: 'nao_faco' })}
